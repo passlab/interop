@@ -1,0 +1,75 @@
+Oversubscription happens when resources are claimed and held than what is needed.
+A program may request more OpenMP threads than the total amount of hardware
+threads available when entering a parallel region, which causes excessive competition 
+among OpenMP threads for hardware threads and increases runtime overhead. 
+When program execution enters into sequential stage after exiting a parallel region, 
+those native threads that support the OpenMP threads in the parallel region may still 
+alive in the background consuming CPU cycles but not doing actual work for users. This 
+will make those hardware threads unavailable to others. 
+Oversubscription impact the performance of an applications and the system, 
+but should not introduce correctness issue to a program. 
+
+%A typical OpenMP runtime creates a pool of native threads who will execute OpenMP
+% parallel regions and/or tasks. 
+
+The two scenarios we mentioned above are the two kinds of oversubscriptions we should try to avoid\footnote{Acknowledgements go to to Jeff Hammond for categorizing the twos and for introducing the two terms}:  
+{\bf 1) Active oversubscription}: Claiming or requesting more threads than 
+what are available by the system.
+{\bf 2) Passive oversubscription}: Thread resources are not released 
+after parallel execution. Holding hardware threads after parallel execution may not 
+always hurt the performance overall, e.g. it will improve the startup performance of the 
+upcoming parallel region. In this category, we are concerning those situations that 
+actually impact the performance negatively.
+
+\subsubsection{Current OpenMP}
+OpenMP currently (4.0) provides limited support for users to give hints to runtime for
+better managing OpenMP threads and native threads, which can be used to help reducing 
+the impact of oversubscriptions.
+\paragraph{OMP\_DYNAMIC} % environment variable}
+This also includes dyn-var ICV, omp\_set\_dynamic and omp\_get\_dynamic runtime routine. OMP\_DYNAMIC could be either
+{\bf true} or {\bf false}. When setting the dyn-var ICV to be {\bf true}, user will expect
+OpenMP implementation to adjust the number of threads to use for executing parallel
+regions in order to optimize the use of system resources.
+
+\paragraph{OMP\_WAIT\_POLICY} %environment variable}
+This also include wait-policy-var ICV, but no getter and setter routine. 
+OMP\_WAIT\_POLICY could be set as either ACTIVE or PASSIVE. 
+The ACTIVE value specifies that waiting threads should mostly be active, consuming processor
+ cycles, while waiting. An OpenMP implementation may, for example, make waiting threads spin.
+ The PASSIVE value specifies that waiting threads should mostly be passive, not consuming
+ processor cycles, while waiting. For example, an OpenMP implementation may make waiting
+ threads yield the processor to other threads or go to sleep.
+ The details of the ACTIVE and PASSIVE behaviors are implementation defined.
+ 
+ \paragraph{OMP\_THREAD\_LIMIT}
+ This also include thread-limit-var ICV and omp\_get\_thread\_limit getter runtime routine.
+ The environment variable sets the maximum number of OpenMP threads to use in a contention group by setting the thread-limit-var ICV.
+The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support. 
+
+OMP\_DYNAMIC and OMP\_THREAD\_LIMIT are approaches to 
+addressing active oversubscriptions, and OMP\_WAIT\_POLICY could be used to address 
+passive oversubscriptions. 
+Since there are no setters for ICVs for OMP\_WAIT\_POLICY 
+and OMP\_THREAD\_LIMIT variable in the current standard, 
+dynamically changing waiting policy and the maximum number of 
+threads at runtime is not available.
+
+%\subsubsection{Posibble Solutions and Proposals}
+The current support in OpenMP provides limited constrol on oversubscriptions, but are sufficient 
+for lots of (if not most of) scenarios if the implemention is available. In the following of this
+report, we propose solutions that will provide more
+control for oversubscription.
+\subsubsection{Change wait policy dynamically to address passive oversubscription}
+The idea is to provide a setter and getter for the wait-policy-var
+ICV. Compilers from IBM, Cray and Oracle have provide this feature~\cite{ibmwait, craywait, oraclewait}.
+There are also different variants of this features depending how much details users can configure
+the wait policy.
+\paragraph{1: {\sf omp\_set\_wait\_policy(ACTIVE$\vert$PASSIVE)} setter} for the wait-policy-var
+ICV with ACTIVE or PASSIVE. This will allow programmer to explicitly change the policy at various 
+points during a program's execution. An efficient implementation may use atomic write to the 
+global ICV and all threads will react accordingly at some later point of the exectution after the 
+ICV is set. So the effects may be delayed.
+
+\paragraph{2: Finer-grained control with new environment variables and setter routine}
+
+

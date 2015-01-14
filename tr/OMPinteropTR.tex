@@ -1,0 +1,129 @@
+\documentclass{article}
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf}
+
+\headheight 0in
+\oddsidemargin 0in
+\evensidemargin  0in
+\topmargin  -.25in
+\textwidth 6.5in
+\textheight 9in
+%\title{OMPinterop: Interoperability and Composability of OpenMP\textsuperscript{\textregistered}}
+\title{Interoperability and Composability of OpenMP\textsuperscript{\textregistered}}
+\author{Yonghong Yan\thanks{cOMPunity}, 
+%John Mellor-Crummey\thanks{Rice University}, 
+%Martin Schulz\thanks{Lawrence Livermore National Laboratory},
+\\~\\
+%Nawal Copty\thanks{Oracle}, 
+%Jim Cownie\thanks{Intel},
+% John DelSignore\thanks{Rogue Wave}, 
+%Robert Dietrich\thanks{TU Dresden, ZIH},
+%Xu Liu\hbox to 0in{$^\dagger$\hss},
+%Eugene Loh\hbox to 0in{$^\S$\hss}, 
+%Daniel Lorenz\thanks{J\"{u}lich Supercomputer Center}, 
+\\
+and other members of the OpenMP Interoperability Subcommittee}
+
+\usepackage{comment}
+\usepackage{needspace}
+\usepackage[colorlinks=true,citecolor=blue]{hyper ref}
+\usepackage{url}
+\usepackage{xcolor}
+
+% correct bad hyphenation here
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{fancyvrb}
+\usepackage{amsmath, amssymb}
+\usepackage{epsfig}
+\usepackage{setspace}\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{wrapfig}
+%\usepackage{hyperref}
+%\usepackage{xltxtra}
+\newcommand{\REM}[1]{}
+
+\newcommand{\descheader}[1]{{\needspace{3\baselineskip}\vspace{1em}\noindent \fbox{#1}}}
+
+
+\begin{document}                                                
+\maketitle
+\section{Introduction}
+Parallel and large-scale applications are typically developed using multiple parallel programming interfaces in 
+a hybrid model, e.g. MPI+OpenMP, and using one or mulitple prebuilt scientific and/or platform-specific libraries such as MKL.
+Each of these programming models and libraries has their own runtime to handle scheduling of work units and management of computational
+and data movement tasks. There have been challening issues for using these models in one application, including 
+compatibility issues for compiling and linking, oversubscription of resources at runtime, and the naming conflicts that 
+programmers have to create workaround wrappers to deal with.
+
+This report propose solutions to the interoperability and composability challenges faced by OpenMP programming interface, includling those
+between multiple OpenMP implementations and/or multiple OpenMP runtime instances of the same implementation, OpenMP 
+with native threads (pthreads and Windows Native threads), OpenMP with other threading languages and library such 
+as C++11, TBB and Cilkplus, and OpenMP with inter-node programming models such as MPI, PGAS implemenation, etc. We 
+think the similar challenges exist in other threading based libraries and language implementations, and believe
+the solutions we provided in this technical report will work for them too.  
+
+Interoperability and composability are closely related, while the interoperability sounds to improve the interactions between multiple models
+while composability is meant to improve the modular use of OpenMP with itself and other models. One is from the aspect of system while 
+the other is more concerned with software engineering. Both should be considered when developing solutions. 
+
+For parallel programming languages and libraries, most implementations rely on system native threading (pthread or Windows Native threads) 
+mechanisms to acquires system resources. Each implementation of the same or different programming models has their own mechanism for scheduling
+user-level tasks and operations, which is the core part of a runtime system. 
+The interoperability challenges are then concerned with how much we want two or more 
+runtime instances (for the same or different high-level programming interfaces) to interact with other other for computational resource sharing
+and data movement. Thus solutions to these challenges are more in the scope of runtime and implementation, than in the level of programming
+interfaces and compiler transformations. 
+
+\section{Topics and Interests}
+
+\subsection{User threads}
+\input{userthread}
+
+\subsection{Oversubscription}
+\input{oversubscription}
+
+\subsection{Interaction between contention groups}
+
+\subsection{Affinity with user threads}
+\subsubsection{Coherence group (domains)}
+
+\subsection{Common Interface}
+\subsubsection{Application Binary Interfaces(ABI)}
+
+\subsection{Interoperability with node-level programming model, e.g. MPI}
+
+\begin{comment}
+\subsection{Use Cases}
+We have identified several use cases of OpenMP interoperating with itself and other parallel programming models. 
+\subsubsection{OpenMP with native threads}
+\subsubsection{OpenMP with TBB/MKL}
+\subsubsection{OpenMP with parallel scientific library, such as MKL}
+\subsubsection{Linking libraries and objects built with different OpenMP compilers}
+\subsubsection{OpenMP with inter-node model, e.g. MPI}
+
+\subsection{Issues and Posibble Solutions}
+\subsubsection{Active Oversubscription}
+\subsubsection{Passive Oversubscription}
+\subsubsection{Interop across contention group}
+\end{comment}
+
+\section*{Acknowledgments}
+
+The authors would like to acknowledge A, B, C and \ldots
+
+\clearpage
+\bibliographystyle{abbrv}
+\bibliography{interop}
+
+\appendix
+\clearpage
+
+\section{OpenMP 4.1 Formal specification}
+\input{ompspec}
+
+%\clearpage
+
+\end{document}
+
