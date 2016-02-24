@@ -48,6 +48,7 @@ void axpy_base(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_parallel(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_parallel_for(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_taskloop(int N, REAL *Y, REAL *X, REAL a, int num_threads);
+void axpy_omp_task(int N, REAL *Y, REAL *X, REAL a);
 
 int main(int argc, char *argv[]) {
     int N = VECTOR_LENGTH;
@@ -88,6 +89,11 @@ int main(int argc, char *argv[]) {
     for (i=0; i<num_runs; i++) axpy_omp_taskloop(N, Y_parallel, X, a, num_threads);
     elapsed_omp_taskloop = (read_timer() - elapsed_omp_taskloop)/num_runs;
     
+    double elapsed_omp_task = read_timer();
+    for (i=0; i<num_runs; i++) axpy_omp_task(N, Y_parallel, X, a);
+    elapsed_omp_task = (read_timer() - elapsed_omp_task)/num_runs;
+    
+    
     /* you should add the call to each function and time the execution */
     printf("======================================================================================================\n");
     printf("\tAXPY: Y[N] = Y[N] + a*X[N], N=%d, %d threads for dist\n", N, num_threads);
@@ -100,6 +106,8 @@ int main(int argc, char *argv[]) {
     printf("axpy_omp_parallel_for:\t\t%4f\t%4f \t\t%g\n", elapsed_omp_parallel_for * 1.0e3, (2.0 * N) / (1.0e6 * elapsed_omp_parallel_for), check(Y_base,
                                                                                                                               Y_parallel, N));
     printf("axpy_omp_taskloop:\t\t%4f\t%4f \t\t%g\n", elapsed_omp_taskloop * 1.0e3, (2.0 * N) / (1.0e6 * elapsed_omp_taskloop), check(Y_base,
+                                                                                                              Y_parallel, N));
+    printf("axpy_omp_task:\t\t\t%4f\t%4f \t\t%g\n", elapsed_omp_task * 1.0e3, (2.0 * N) / (1.0e6 * elapsed_omp_task), check(Y_base,
                                                                                                               Y_parallel, N));
 
     free(Y_base);
@@ -114,7 +122,6 @@ void axpy_base(int N, REAL *Y, REAL *X, REAL a) {
     for (i = 0; i < N; ++i)
         Y[i] += a * X[i];
 }
-
 
 
 void axpy_omp_parallel(int N, REAL *Y, REAL *X, REAL a) {
@@ -132,9 +139,24 @@ void axpy_omp_parallel(int N, REAL *Y, REAL *X, REAL a) {
     }
 }
 
+//=============continuation scheduler
 void axpy_omp_task(int N, REAL *Y, REAL *X, REAL a) {
 
-}
+ if (N<=32) {
+       int i;
+       for (i = 0; i < N; ++i)
+          Y[i] += a * X[i];
+            } else {
+#pragma omp parallel shared(N, Y, X, a)
+     #pragma omp task shared(Y, X, a) private(N)
+        axpy_omp_task(N/2, Y, X, a);
+     #pragma omp single
+       axpy_omp_task(N-N/2, Y+N/2, X+N/2, a);
+     #pragma omp taskwait
+                   }
+    }
+ 
+//===============Child-stealing scheduler
 
 void axpy_omp_taskloop(int N, REAL *Y, REAL *X, REAL a, int num_threads) {
     int i;
