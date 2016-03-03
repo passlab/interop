@@ -48,7 +48,7 @@ void axpy_base(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_parallel(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_parallel_for(int N, REAL *Y, REAL *X, REAL a);
 void axpy_omp_taskloop(int N, REAL *Y, REAL *X, REAL a, int num_threads);
-void axpy_omp_task(int N, REAL *Y, REAL *X, REAL a);
+void axpy_omp_task_driver(int N, REAL *Y, REAL *X, REAL a, int num_threads);
 
 int main(int argc, char *argv[]) {
     int N = VECTOR_LENGTH;
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     elapsed_omp_taskloop = (read_timer() - elapsed_omp_taskloop)/num_runs;
     
     double elapsed_omp_task = read_timer();
-    for (i=0; i<num_runs; i++) axpy_omp_task(N, Y_parallel, X, a);
+    for (i=0; i<num_runs; i++) axpy_omp_task_driver(N, Y_parallel, X, a, num_threads);
     elapsed_omp_task = (read_timer() - elapsed_omp_task)/num_runs;
     
     
@@ -139,18 +139,26 @@ void axpy_omp_parallel(int N, REAL *Y, REAL *X, REAL a) {
     }
 }
 
+
+void axpy_omp_task_driver(int N, REAL *Y, REAL *X, REAL a, int num_threads) {
+
+#pragma omp parallel shared(N, X, Y, a)  num_threads(num_threads)
+{
+#pragma omp single
+axpy_omp_task(N, Y, X, a);
+}
+
+}
 //=============continuation scheduler
 void axpy_omp_task(int N, REAL *Y, REAL *X, REAL a) {
 
- if (N<=32) {
+ if (N<=1000) {
        int i;
        for (i = 0; i < N; ++i)
           Y[i] += a * X[i];
             } else {
-#pragma omp parallel shared(N, Y, X, a)
-     #pragma omp task shared(Y, X, a) private(N)
+     #pragma omp task shared(Y, X, a, N)
         axpy_omp_task(N/2, Y, X, a);
-     #pragma omp single
        axpy_omp_task(N-N/2, Y+N/2, X+N/2, a);
      #pragma omp taskwait
                    }
