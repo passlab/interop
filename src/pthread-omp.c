@@ -31,6 +31,10 @@ void busy_waiting(int second) {
 	sleep(second); /* temporary implem */
 }
 
+void omp_quiesce() {
+	__kmpc_end();
+}
+
 #define NUM_ITERATIONS 100000000
 
 void *omp_parallel_foo(void *ptr )
