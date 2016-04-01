@@ -5,6 +5,9 @@
 
 void *omp_parallel_foo(void *ptr);
 
+/**Important: make sure you use num_threads clause in parallel direction and set it to the 
+ * number of hardware cores, not the number of cores Linux gives or the default from OpenMP
+ */
 int main(int argc, char * argv[])
 {
      pthread_t thread1, thread2;
