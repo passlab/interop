@@ -1,3 +1,5 @@
+/* from Xavier's slides */
+
 void cholesky_factorization(const int ts, const int nt, double* A[nt][nt]) {
 #pragma omp parallel
 #pragma omp single

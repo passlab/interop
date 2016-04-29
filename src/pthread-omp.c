@@ -5,6 +5,14 @@
 
 void *omp_parallel_foo(void *ptr);
 
+/**Important: make sure you use num_threads clause in parallel direction and set it to the 
+ * number of hardware cores, not the number of cores Linux gives or the default from OpenMP
+ * 
+ * cat /proc/cpuinfo and check the processor id, core id and CPU model number so you can look up fron internet
+ * Lennon is Xeon CPU E5-2683 v3 @ 2.00GHz, it has two CPU for total 28 cores, but support upto 56 threads
+ * Paul is Xeon CPU E5-2695 v2 @ 2.40GHz, it has two CPU for total 24 cores, support upto 48 threads
+ * Fornax Intel® Xeon® E5-2699 v3 2.3GHz, it has two CPU for total 36 cores, support upto 72 threads.
+ */
 int main(int argc, char * argv[])
 {
      pthread_t thread1, thread2;
@@ -12,14 +20,14 @@ int main(int argc, char * argv[])
      const char *message2 = "pthread 2";
 
     /* Create independent threads each of which will execute function */
-     pthread_create(&thread1, NULL, omp_parallel_foo, (void*) 1);
+     //pthread_create(&thread1, NULL, omp_parallel_foo, (void*) 1);
      pthread_create(&thread2, NULL, omp_parallel_foo, (void*) 2);
 
      /* Wait till threads are complete before main continues. Unless we  */
      /* wait we run the risk of executing an exit which will terminate   */
      /* the process and all threads before the threads have completed.   */
 
-     omp_parallel_foo((void*)0);
+     omp_parallel_foo((void*)1);
 
      pthread_join(thread1, NULL);
      pthread_join(thread2, NULL);
@@ -29,6 +37,10 @@ int main(int argc, char * argv[])
 
 void busy_waiting(int second) {
 	sleep(second); /* temporary implem */
+}
+
+void omp_quiesce() {
+	__kmpc_end();
 }
 
 #define NUM_ITERATIONS 100000000
