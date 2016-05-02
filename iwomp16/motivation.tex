@@ -1,0 +1,10 @@
+
+There are still some challenges in terms of OpenMP interoperability. OpenMP threads that are created by the parallel construct cannot interact with external systems. In other words, we are trying to enable the interoperability through flexible communication between OpenMp threads and user threads. However, the main goal of this work is to achieve a high level of resource utilization. So, it would be better if OpenMP threads can interact and communicate with user threads. To achieve this goal, we implement four new functions as follows:
+\begin{enumerate}
+	\item int omp{\_}set{\_}wait{\_}policy(ACTIVE \textbar PASSIVE): 
+	set the waiting thread behavior. The function returns the current wait{\_}policy, which could be different from intention of the call depending on the decision made by the runtime. If the value is PASSIVE, waiting threads should not consume CPU power while waiting; while the value is ACTIVE specifies that they should.
+	\item int omp{\_}thread{\_}create( ): 
+	to give the user the ability to create an OpenMP thread without using \#pragma omp parallel directive, and lets it be a user thread similar to pthread.
+	\item int ompe{\_}quiesce( ): 
+	to shutdown or unload the OpenMP runtime library.
+\end{enumerate}

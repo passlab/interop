@@ -1,0 +1,29 @@
+\subsection{What is an OpenMP?}
+OpenMP is an implementation model to support the implementation of parallel algorithms. It is primarily designed for shared memory multiprocessors. The goal of OpenMP is to provide a standard and portable API for writing shared memory parallel programs~\cite{dagum1998openmp}. 
+
+OpenMP takes a directive-based approach for supporting parallelism. It consists of a set of directives that may be embedded within a program written in a base language such as Fortran, C, or C++. There are two compelling benefits of a directive-based approach that led to this choice: The first is that this approach allows the same code base to be used for development on both single-processor and multiprocessor platforms; on the former, the directives are simply treated as comments and ignored by the language translator, leading to correct serial execution. The second related benefit is that it allows an incremental approach to parallelism—starting from a sequential program, the programmer can embellish the same existing program with directives that express parallel execution. These directives may be offered within any base language (within the C/C++ languages, directives are referred to as “pragmas”). In addition to directives, OpenMP also includes a small set of runtime library routines and environment variables. These are typically used to examine and modify the execution parameters. The language extensions in OpenMP fall into one of three categories: control structures for expressing parallelism, data environment constructs for communicating between threads, and synchronization constructs for coordinating the execution of multiple threads~\cite{chandra2001parallel}.
+\subsection{How does OpenMP work?}
+OpenMP uses a fork/join execution model. OpenMP provides two kinds of constructs for controlling parallelism. First, it provides a directive to create multiple threads of execution that execute concurrently with each other. The only instance of this is the parallel directive. Second, OpenMP provides constructs to divide work among an existing set of parallel threads. An instance of this is the do directive. 
+
+An OpenMP program always begins with a single thread of control that has associated with it an execution context or data environment. This initial thread of control is referred to as the master thread. When the master thread encounters a parallel construct, new threads of execution are created along with an execution context for each thread. Each thread has its own stack within its execution context. The execution context for a thread is the data address space containing all the variables specified in the program. Multiple OpenMP threads communicate with each other through ordinary reads and writes to shared variables.
+\subsection{OpenMP Runtime Library}
+The OpenMP API runtime library routines are external procedures. The return values of these routines are of default kind, unless otherwise specified. Runtime library provides interface to the compiler. The runtime interface is based on the idea that the compiler ``outlines`` code that is to run in parallel into separate functions that can then be invoked in multiple threads. OpenMP provides several runtime library routines to assist you in managing your program in parallel mode. Many of these runtime library routines have corresponding environment variables that can be set as defaults. The runtime library routines enable you to dynamically change these factors to assist in controlling your program. In all cases, a call to a runtime library routine overrides any corresponding environment variable. 
+
+Generally, we can analyze the architecture into two perspectives: the parallelization regions and the data.
+\begin{enumerate}
+	\item Region perspective.
+	We use “parallel” to automatically create multi-threads. And each thread will be executed without order. However, we can use ordered clause to guarantee the code be executed in sequence. There are different types of parallel regions:
+	\begin{itemize}
+		\item Section means the task is assigned to each thread.
+		\item Single means the task is assigned to a random thread.
+		\item Master means the task is executed in the master thread.
+	\end{itemize}
+	For the default parallel regions, we can use “schedule” to design a way to assign tasks to different threads. Generally, we can implement this assignment in three ways:
+	\begin{itemize}
+		\item Static: equally assign them to n threads.
+		\item Dynamic: assign them to the idle thread only.
+		\item Guided: implement the dynamic assignment reductively.
+	\end{itemize}
+	\item Data perspective.
+	We have two kinds of variables. Variables that are defined before parallel region are shared among every thread, while those defined in parallel regions can be only accessed by certain threads. We use “threadprivate” to change those shared variables into a private one for each thread. This is done by generating a new private variable for every single thread. For those shared variables, we must pay attention to the data race problem, which defined as two different memory operations are trying to use a same variable, and different execution order may lead to different results. To solve this problem, we can use “critical” or “atomic” directive to guarantee that the data can be only accessed by one thread at a time. We can also set “barriers” to make sure all threads have been executed before starting any new threads. Sometimes the update of certain variables are stored only in registers, we can use “flush” to directly write the data back to memory to make sure that other threads will use the data that already been updated.
+\end{enumerate}

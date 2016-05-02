@@ -1,0 +1,48 @@
+
+In general, to implement those four functions, we follow the three steps:
+\begin{itemize}
+	\item Define this function in file “kmp{\_}csupport.c”, 
+	write down the implementation.
+	\item Declare this function in file “kmp.h”, 
+	using “KMP{\_}EXPORT” in front the declaration.
+	\item Export this function in file “dllexports”, 
+	assign a unique ID for this function.
+\end{itemize}
+
+\begin{enumerate}
+	\item void omp{\_}quiesce()
+	
+	The purpose of this function is to shutdown or destroy all OpenMP threads in the thread pool. We have implemented it, as shown in Figure~\ref{omp:quiesce}, by using the Intel internal call to {\_}kmp{\_}internal{\_}end{\_}fini, which unloads the runtime library. Then, we have to register the master thread again so it can generate team of threads later when needed. This can be done by calling the {\_}kmp{\_}get{\_}global{\_}thread{\_}id{\_}reg( ).
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth] {images/omp_quisce}
+		\caption{omp\_quiesce}
+		\label{omp:quiesce}
+	\end{figure}
+	
+	\item void omp{\_}set{\_}wait{\_}policy(PASSIVE \textbar ACTIVE)
+	
+	The idea of this function is to set the waiting thread behavior. PASSIVE value means that waiting threads should not consume CPU power while waiting. In other words, the OpenMP runtime system will put them into a sleep mode. On the other hand, ACTIVE value means that waiting threads should keep asking the CPU for work to do. The intention of doing this function is to measure the differences in performance between these different modes. 
+	The implementation of this function is done by using the internal {\_}kmp{\_}stg{\_}parse{\_}wait{\_}policy as shown in Figure~\ref{omp:set_wait_policy}. The current OpenMP runtime system uses the library{\_}turnaround to indicate the ACTIVE mode and library{\_}throughput to indicate the PASSIVE mode. We pass an integer as its parameter. If it equals to 0, we set the wait policy to be passive, otherwise, active. We found a variable named “{\_}kmp{\_}library” in the environment setting file which has four different status for the waiting policy. So, we change this value accordingly, then we call a function “{\_}kmp{\_}aux{\_}set{\_}library” to set the changed value to the OpenMP environment.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth] {images/omp_set_wait_policy}
+		\caption{omp\_set\_wait\_policy}
+		\label{omp:set_wait_policy}
+	\end{figure}
+	
+	\item int omp{\_}thread{\_}create()
+	
+	The purpose of this function is to give the user the ability to create an OpenMP thread without using \#pragma omp parallel directive, and lets it be a user thread similar to pthread. The implementation of this function is shown in Figure~\ref{omp:create_thread}.
+	So, we are creating one thread to execute the passed function. If there are enough available threads in the thread pool, we will get one thread from the thread pool and assign the task to it. If no thread is available in the thread pool, we create a new thread to execute this task, and then put the new thread back into the thread pool after completing its job. 
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth] {images/omp_create_thread}
+		\caption{omp\_create\_thread}
+		\label{omp:create_thread}
+	\end{figure}
+	
+\end{enumerate}

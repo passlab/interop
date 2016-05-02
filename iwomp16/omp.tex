@@ -1,0 +1,92 @@
+\documentclass{llncs}
+%
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{fancyvrb}
+%\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage{setspace}
+\usepackage{multirow}
+%\usepackage{subfigure}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{placeins}
+%\usepackage{hyperref}
+\def\ie{{\em i.e.,}}
+\def\eg{{\em e.g.,}}
+\newcommand{\REM}[1]{}
+%
+%\setlength{\textfloatsep}{0.4cm} 
+\begin{document}
+%
+\mainmatter              % start of the contributions
+%
+\title{OpenMP Runtime Interoperability} %
+%\title{A Portable Abstraction for Task Parallelism and Data Movement in Hierarchical Multiprocessors} %
+%\titlerunning{Hamiltonian Mechanics}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+\author{Ali Alqazzaz \and Zijun Han \and Yonghong Yan}
+
+%
+%\authorrunning{Ivar Ekeland et al.}   % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+%\tocauthor{Ivar Ekeland, Roger Temam, Jeffrey Dean, David Grove,
+%Craig Chambers, Kim B. Bruce, Elisa Bertino}
+%
+\institute{Department of Computer Science, Oakland University\\
+\email{\{aalqazzaz,zhan,yan\}@oakland.edu}}
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+%
+
+%\keywords
+%Java, GPU, High Performance 
+\section{Introduction}\label{sec:intro}
+\input{intro}
+
+\section{Challenges and Motivations}
+\label{sec:motivation}
+\input{motivation}
+
+\section{Implementation}
+\label{sec:implementation}
+\input{implementation}
+
+\section{Experimental Results}
+\label{sec:results}
+\input{results} 
+%\section{Hierarchical Place Trees (HPT) Model} 
+%\label{sec:model}
+%\input{modeling}
+
+%\section{Programming Interface and Implementation}
+%\label{sec:interface}
+%\input{interface}
+
+%\vspace{-0.8cm}
+%\section{Preliminary Experimental Results}
+%\label{sec:eva}
+%\input{eva}
+
+%\section{Related Work}
+%\label{sec:related}
+%\input{related}
+\FloatBarrier
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+\input{conclusion}
+%\vspace{-0.1in}
+%\section*{Acknowledgments}
+
+\small{
+\bibliographystyle{plain}
+%IEEEtran}
+%\nocite{*}
+\bibliography{IEEEabrv,bib/bib}
+}
+\end{document}
