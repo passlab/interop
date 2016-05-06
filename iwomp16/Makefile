@@ -1,55 +1,57 @@
+#
+# $Id: Makefile 279 2008-01-27 16:19:38Z balaji $
+#
+# Copyright (C) 2006-2007, University of Chicago. All rights reserved.
+#
 
-# issues of embedding fonts in pdf doc. The figures created using MS word has some problem to embed fonts when printing 
-# them using ps printer driver. finally, we are using Linux openoffice to print it to ps file and use ps2epsi and ps2pdf utilities to 
-# create eps and pdf figure file.  
-# The process is as follows:
-# 1. print the figure in (open office) to a file and save it as a *.ps file
-# 2. ps2epsi command to create the *.epsi file and rename it to *.eps file
-# 3.  ps2pdf -dEmbedAllFonts=true -dSubsetFonts=true -dEPSCrop=true *.eps to create cropped pdf file
-# Now both the latex and pdflatex works 
+HEADER = omp
+PICS = images
+BIB = bib
+TEX = .
 
-LATEX=latex
-PDFLATEX=pdflatex
-BIBTEX=bibtex
+TARGETS: $(HEADER).pdf
+.PHONY: all clean
 
-SRCPRE=omp
+tex_files = $(shell find $(TEX) -name '*.tex' -print)
+bib_files = $(shell find $(BIB) -name '*.bib' -print)
+pic_files = $(shell find $(PICS) \
+		\( -name '*.eps' -print \) -or \( -name '*.epsi' -print \) \
+		-or \( -name '*.ps' -print \) -or \( -name '*.png' -print \) \
+		-or \( -name '*.fig' -print \) -or \( -name '*.pdf' -print \) \
+	)
 
-SRC=$(SRCPRE).tex
-BIBFILE=$(SRCPRE)
-PDF=$(SRC:.tex=.pdf)
+$(HEADER).pdf: $(HEADER).tex $(tex_files) $(bib_files) $(pic_files)
+	@if test "`which rubber`" != "" ; then \
+		TEXMFOUTPUT=`pwd` rubber -d -f $(HEADER) ; \
+	else \
+		pdflatex $(HEADER) | tee latex.out ; \
+		bibtex $(HEADER); \
+		touch .rebuild; \
+		pdflatex $(HEADER) | tee latex.out; \
+		pdflatex $(HEADER) | tee latex.out; \
+		rm -f latex.out ; \
+	fi
 
-default: pdf
-
-dvi:
-	make clean
-	$(LATEX) $(SRC)
-	-$(BIBTEX) $(BIBFILE)
-	$(LATEX) $(SRC)
-	$(LATEX) $(SRC)
-
-pdf:
-	$(PDFLATEX) $(SRC)
-	-$(BIBTEX) $(BIBFILE)
-	$(PDFLATEX) $(SRC)
-	$(PDFLATEX) $(SRC)
-
-dvipdf: dvi
-	dvips -Ppdf -G0 -tletter ${SRCPRE}
-	ps2pdf -dCompatibilityLevel=1.4 -dMAxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sPAPERSIZE=letter ${SRCPRE}.ps
-#	$(PDFLATEX) $(SRC)
-#	-$(BIBTEX) $(BIBFILE)
-#	$(PDFLATEX) $(SRC)
-#	$(PDFLATEX) $(SRC)
-
-view: dvi
-#	xdvi $(SRCPRE).dvi	
-	evince $(SRCPRE).dvi	 >/dev/null 2>&1&
-
-viewpdf: pdf
-	acroread $(SRCPRE).pdf >/dev/null 2>&1&
+$(HEADER).ps: $(HEADER).tex $(tex_files) $(bib_files) $(pic_files)
+	@if test "`which rubber`" != "" ; then \
+		TEXMFOUTPUT=`pwd` rubber -d $(HEADER) ; \
+	else \
+		pslatex $(HEADER) | tee latex.out ; \
+		bibtex $(HEADER); \
+		touch .rebuild; \
+		pslatex $(HEADER) | tee latex.out; \
+		pslatex $(HEADER) | tee latex.out; \
+		rm -f latex.out ; \
+	fi
 
 clean:
-	rm -f *.log *.aux *.dvi *.ps  *.bbl *.aux *.blg *.toc
-
-clobber:clean
-	rm -rf *.bak
+	@if test "`which rubber`" != "" ; then \
+		rubber -d --clean $(HEADER) ; \
+	else \
+		find . \( -name '*.blg' -print \) -or \( -name '*.aux' -print \) -or \
+			\( -name '*.bbl' -print \) -or \( -name '*~' -print \) -or \
+			\( -name '*.lof' -print \) -or \( -name '*.lot' -print \) -or \
+			\( -name '*.toc' -print \) | xargs rm -f; \
+		rm -f $(HEADER).dvi $(HEADER).log $(HEADER).ps $(HEADER).pdf $(HEADER).out \
+			_region_* TAGS ; \
+	fi
