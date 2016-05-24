@@ -6,7 +6,7 @@
 
 HEADER = omp
 PICS = images
-BIB = bib
+BIB = .
 TEX = .
 
 TARGETS: $(HEADER).pdf

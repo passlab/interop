@@ -1,19 +1,31 @@
 \documentclass{llncs}
 %
-\usepackage{makeidx}  % allows for indexgeneration
-\usepackage{fancyvrb}
-%\usepackage{amsmath}
-\usepackage{epsfig}
-\usepackage{setspace}
-\usepackage{multirow}
-%\usepackage{subfigure}
-\usepackage{subfig}
 \usepackage{graphicx}
 \usepackage{placeins}
 %\usepackage{hyperref}
-\def\ie{{\em i.e.,}}
-\def\eg{{\em e.g.,}}
+
+\usepackage{comment}
+\usepackage{needspace}
+\usepackage{url}
+\usepackage{xcolor}
+
+% correct bad hyphenation here
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{fancyvrb}
+\usepackage{amsmath, amssymb}
+\usepackage{epsfig}
+\usepackage{setspace}\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{wrapfig}
+%\usepackage{hyperref}
+%\usepackage{xltxtra}
 \newcommand{\REM}[1]{}
+
+%\newcommand{\descheader}[1]{{\needspace{3\baselineskip}\vspace{1em}\noindent \fbox{#1}}}
+
+
 %
 %\setlength{\textfloatsep}{0.4cm} 
 \begin{document}
@@ -46,7 +58,8 @@
 
 %\keywords
 %Java, GPU, High Performance 
-\section{Introduction}\label{sec:intro}
+\section{Introduction}
+\label{sec:intro}
 \input{intro}
 
 \section{Challenges and Proposal}
@@ -87,6 +100,6 @@
 \bibliographystyle{plain}
 %IEEEtran}
 %\nocite{*}
-\bibliography{IEEEabrv,bib/bib}
+\bibliography{IEEEabrv,interop}
 }
 \end{document}

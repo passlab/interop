@@ -1,0 +1,28 @@
+The complete OMP\_DYNAMIC spec reads: 
+``The OMP\_DYNAMIC environment variable controls dynamic adjustment of the number of threads
+to use for executing parallel regions by setting the initial value of the dyn-var ICV. The value of
+this environment variable must be true or false. If the environment variable is set to true, the
+OpenMP implementation may adjust the number of threads to use for executing parallel
+regions in order to optimize the use of system resources. If the environment variable is set to
+false, the dynamic adjustment of the number of threads is disabled. The behavior of the program
+is implementation defined if the value of OMP\_DYNAMIC is neither true nor false.''
+
+
+The complete OMP\_WAIT\_POLICY spec reads: 
+``The OMP\_WAIT\_POLICY environment variable provides a hint to an OpenMP
+ implementation about the desired behavior of waiting threads by setting the wait-policy-var ICV. A
+ compliant OpenMP implementation may or may not abide by the setting of the environment
+ variable.
+ The value of this environment variable takes the form:
+ ACTIVE \textbar  PASSIVE. 
+ The ACTIVE value specifies that waiting threads should mostly be active, consuming processor
+ cycles, while waiting. An OpenMP implementation may, for example, make waiting threads spin.
+ The PASSIVE value specifies that waiting threads should mostly be passive, not consuming
+ processor cycles, while waiting. For example, an OpenMP implementation may make waiting
+ threads yield the processor to other threads or go to sleep.
+ The details of the ACTIVE and PASSIVE behaviors are implementation defined.''
+
+ 
+The complete OMP\_THREAD\_LIMIT spec reads:
+``The OMP\_THREAD\_LIMIT environment variable sets the maximum number of OpenMP threads to use in a contention group by setting the thread-limit-var ICV.
+The value of this environment variable must be a positive integer. The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support, or if the value is not a positive integer.''

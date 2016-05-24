@@ -15,7 +15,7 @@
 
 \subsection{Interoperability with node-level programming model, e.g. MPI}
 
-\begin{comment}
+	\REM{
 \subsection{Use Cases}
 We have identified several use cases of OpenMP interoperating with itself and other parallel programming models. 
 \subsubsection{OpenMP with native threads}
@@ -28,7 +28,7 @@ We have identified several use cases of OpenMP interoperating with itself and ot
 \subsubsection{Active Oversubscription}
 \subsubsection{Passive Oversubscription}
 \subsubsection{Interop across contention group}
-\end{comment}
+}
 
 There are still some challenges in terms of OpenMP interoperability. OpenMP threads that are created by the parallel construct cannot interact with external systems. In other words, we are trying to enable the interoperability through flexible communication between OpenMp threads and user threads. However, the main goal of this work is to achieve a high level of resource utilization. So, it would be better if OpenMP threads can interact and communicate with user threads. To achieve this goal, we implement four new functions as follows:
 \begin{enumerate}
