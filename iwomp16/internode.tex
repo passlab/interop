@@ -1,0 +1,10 @@
+Hybrid parallel programming in the form of internode+intranode, e.g. MPI+X model are widely used for 
+for high-performance computing. This approach reflects the two-level hierarchy of parallelism in current HPC systems, 
+in which a high-speed interconnect
+joins many highly parallel nodes.
+Interoperability between inter-node programming model such as MPI and OpenMP 
+systems has long been a productivity and composability goal within
+the parallel programming community. (need to rephrase since it is copied from somewhere).
+The MPI endpoints~\cite{Dinan:mpiendpoint_eurompi13} proposal to the MPI standard is an approach to register a thread in an
+MPI process as a MPI communicator rank that is able to independently paraticipate in message passing operations. There are also 
+efforts of integrating MPI calls as tasks in a intra-node workstealing runtime~\cite{hcmpi:ipdps13}. 
