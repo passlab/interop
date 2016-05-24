@@ -1,4 +1,35 @@
 
+\subsection{User threads}
+\input{userthread}
+
+\subsection{Oversubscription}
+\input{oversubscription}
+
+\subsection{Interaction between contention groups}
+
+\subsection{Affinity with user threads}
+\subsubsection{Coherence group (domains)}
+
+\subsection{Common Interface}
+\subsubsection{Application Binary Interfaces(ABI)}
+
+\subsection{Interoperability with node-level programming model, e.g. MPI}
+
+\begin{comment}
+\subsection{Use Cases}
+We have identified several use cases of OpenMP interoperating with itself and other parallel programming models. 
+\subsubsection{OpenMP with native threads}
+\subsubsection{OpenMP with TBB/MKL}
+\subsubsection{OpenMP with parallel scientific library, such as MKL}
+\subsubsection{Linking libraries and objects built with different OpenMP compilers}
+\subsubsection{OpenMP with inter-node model, e.g. MPI}
+
+\subsection{Issues and Posibble Solutions}
+\subsubsection{Active Oversubscription}
+\subsubsection{Passive Oversubscription}
+\subsubsection{Interop across contention group}
+\end{comment}
+
 There are still some challenges in terms of OpenMP interoperability. OpenMP threads that are created by the parallel construct cannot interact with external systems. In other words, we are trying to enable the interoperability through flexible communication between OpenMp threads and user threads. However, the main goal of this work is to achieve a high level of resource utilization. So, it would be better if OpenMP threads can interact and communicate with user threads. To achieve this goal, we implement four new functions as follows:
 \begin{enumerate}
 	\item int omp{\_}set{\_}wait{\_}policy(ACTIVE \textbar PASSIVE): 
