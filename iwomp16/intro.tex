@@ -1,3 +1,31 @@
+Parallel and large-scale applications are typically developed using multiple parallel programming interfaces in 
+a hybrid model, e.g. MPI+OpenMP, and using one or mulitple prebuilt scientific and/or platform-specific libraries such as MKL.
+Each of these programming models and libraries has their own runtime to handle scheduling of work units and management of computational
+and data movement tasks. There have been challening issues for using these models in one application, including 
+compatibility issues for compiling and linking, oversubscription of resources at runtime, and the naming conflicts that 
+programmers have to create workaround wrappers to deal with.
+
+This report propose solutions to the interoperability and composability challenges faced by OpenMP programming interface, includling those
+between multiple OpenMP implementations and/or multiple OpenMP runtime instances of the same implementation, OpenMP 
+with native threads (pthreads and Windows Native threads), OpenMP with other threading languages and library such 
+as C++11, TBB and Cilkplus, and OpenMP with inter-node programming models such as MPI, PGAS implemenation, etc. We 
+think the similar challenges exist in other threading based libraries and language implementations, and believe
+the solutions we provided in this technical report will work for them too.  
+
+Interoperability and composability are closely related, while the interoperability sounds to improve the interactions between multiple models
+while composability is meant to improve the modular use of OpenMP with itself and other models. One is from the aspect of system while 
+the other is more concerned with software engineering. Both should be considered when developing solutions. 
+
+For parallel programming languages and libraries, most implementations rely on system native threading (pthread or Windows Native threads) 
+mechanisms to acquires system resources. Each implementation of the same or different programming models has their own mechanism for scheduling
+user-level tasks and operations, which is the core part of a runtime system. 
+The interoperability challenges are then concerned with how much we want two or more 
+runtime instances (for the same or different high-level programming interfaces) to interact with other other for computational resource sharing
+and data movement. Thus solutions to these challenges are more in the scope of runtime and implementation, than in the level of programming
+interfaces and compiler transformations. 
+
+
+\REM{
 \subsection{What is an OpenMP?}
 OpenMP is an implementation model to support the implementation of parallel algorithms. It is primarily designed for shared memory multiprocessors. The goal of OpenMP is to provide a standard and portable API for writing shared memory parallel programs~\cite{dagum1998openmp}. 
 
@@ -27,3 +55,4 @@ Generally, we can analyze the architecture into two perspectives: the paralleliz
 	\item Data perspective.
 	We have two kinds of variables. Variables that are defined before parallel region are shared among every thread, while those defined in parallel regions can be only accessed by certain threads. We use “threadprivate” to change those shared variables into a private one for each thread. This is done by generating a new private variable for every single thread. For those shared variables, we must pay attention to the data race problem, which defined as two different memory operations are trying to use a same variable, and different execution order may lead to different results. To solve this problem, we can use “critical” or “atomic” directive to guarantee that the data can be only accessed by one thread at a time. We can also set “barriers” to make sure all threads have been executed before starting any new threads. Sometimes the update of certain variables are stored only in registers, we can use “flush” to directly write the data back to memory to make sure that other threads will use the data that already been updated.
 \end{enumerate}
+}

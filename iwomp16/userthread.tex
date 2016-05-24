@@ -1,0 +1,72 @@
+%\textbf{Definition}
+A user thread in a program is a thread that is not created by an OpenMP implementation. A user thread 
+could become an OpenMP initial thread. 
+The most common example of user threads are POSIX Threads (PThreads) on POSIX-compliant Unix/Linux systems, 
+%There are also implementations of other thread libraries, 
+%for example, 
+Windows Native threads and language based threading support such as Java threads, C++11 threads and futures, as well as others such as qthreads. 
+Most OpenMP implementations do not consider the existence of user threads in the runtime scheduling and resource managements. 
+The existence of multiple user threads in an OpenMP program adds additional level(s) in the overall ``threading''
+hierarchy of a program. % Those additional levels could be on top of OpenMP threading mechanism when 
+A user thread could become an OpenMP initial thread that creates OpenMP thread
+parallelism, or beneath the OpenMP threading mechanism when an OpenMP thread spawns 
+a user thread, or the the mix of both. 
+
+These additional levels of threading increase the complexity of a program, both for 
+users in the aspect of reasoning the parallel and synchronization behavior of a program, 
+and also for the implementation and runtime system in terms of resource management and 
+interactions. Adding to the complexity is the facts that a user thread may be created 
+through a call to a library function whose paralelism (OpenMP) behavior is not known to 
+the callee. Typical issues for example: 
+\begin{itemize}
+\item Does each user thread use the same OpenMP runtime libraries or not? 
+	If not using the same library, how to handle symbol name 
+	conflicts of two more different OpenMP runtime libraries. 
+\item For user threads that use the same OpenMP runtime library, does the user threads each create its own runtime instance or they share one?
+\item For user threads each of which has its own runtime instance (from the same or 
+	different runtime library), how to coordinate the resource management among those
+	runtime instances to address such issues as oversubscriptions and the affinity
+	between user threads?
+\end{itemize}
+
+It is important to note that approaches to address those issues are very implementation
+dependent, requiring protocol and agreement in the runtime behavior and/or interfaces 
+of different OpenMP implementations. It may not be realistic to solve some of the issue
+from the language standard, and should be left to users to deal with them. In this
+aspect, we still hope this report could provide userful information and practices 
+for users. 
+
+\REM{
+Figure~\ref{fig:pthread-omp} shows an example of having three user 
+threads (two PThreads and one thread of the main program) in an OpenMP program. 
+The two three threads execute in parallel after the two PThreads are created. 
+Each thread calls a function that will enter into
+OpenMP threading parallelism. So they all become OpenMP initial threads. How the 
+user threads (PThreads in this example) interact with the OpenMP threading mechanisms
+in the runtime is up to the implementation. They may share the same OpenMP runtime
+instance or each has its own OpenMP runtime instance. 
+
+In the example from Figure~\ref{fig:pthread-omp}, 
+one can view this in a two-level threading parallelism: the top level user thread 
+parallelism and the bottom level OpenMP threading parallelism.
+
+\begin{figure}[t]
+\centering
+  \fbox{
+ % \lstset{basicstyle=\ttfamily\scriptsize,language=c}
+  \lstset{basicstyle=\ttfamily\scriptsize,language=c,numbers=left, %,frame=single,
+  deletekeywords={int,if,else,while},
+  morekeywords={pragma,omp,target,device,map,
+  tofrom,to,from,alloc,parallel,shared,reduction,data,collapse,
+  private,dist_iteration,match_range,halo,exchange},
+  numbersep=12pt,numberstyle=\color{red}}
+  \lstinputlisting{pthread-omp.c}
+
+}
+\caption{Three user threads (two Pthreads and one main thread) with OpenMP}
+  \label{fig:pthread-omp}
+\end{figure}
+
+\subsection{Impacts and Discussions}
+}
+
