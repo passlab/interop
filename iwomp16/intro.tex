@@ -1,8 +1,27 @@
+High-performance computing (HPC) applications must exploit parallelism
+in order to take advantage of all of the hardware resources of
+modern multicore nodes, potentially with some form of heterogeneity.
+(e.g. specialized coprocessors).
+Obviously, there are a number of ways to map algorithmic concurrency
+to hardware parallelism, which on general purpose processors rely
+upon either multithreading or multiprocessing, which are different
+from the user perspective but very similar from the perspective of
+the operating system and hardware.
+OpenMP is the most popular programming model for multithreading in HPC,
+although it is far from the only one.
+Other portable threading models that may be used in HPC include
+POSIX threads,
+Intel\regtm{} Threading Building Blocks (TBB)\footnote{TBB is build on top
+of POSIX\othertm{} threads (at least on Linux\othertm{} systems), and is portable to
+processors from AMD\othertm, ARM\othertm, IBM\othertm, Intel and other vendors.},
+ISO\othertm{} C11 and C++ threads, and
+OpenCL\othertm.
+
 \begin{comment}
 
 Applications are using multiple threading models.
-Common ones include OpenMP, POSIX threads, TBB, OpenCL.
-Now that C11 and C++11 both have threads, and C++11 has
+Common ones include OpenMP\othertm, POSIX threads, TBB, OpenCL\othertm.
+Now that ISO\othertm C11 and C++11 both have threads, and C++11 has
 std::async, std::future, etc., programmers have many
 ways to create threads in a program.
 
