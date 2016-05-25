@@ -5,6 +5,9 @@ with itself and other parallel programming models.
 In this paper, we explore typical use cases to expose OpenMP's interoperability challenges and
 propose a number of solutions.
 %which address one of more aspects of OpenMP's interoperability problem.
-The solutions we consider include OpenMP's wait policy,
+The solutions we propose include several levels of interoperability functionalities of an OpenMP runtime and
+the corresponding OpenMP constructs supporting each level.
+Ongoing implementation is being done by extending Intel OpenMP runtime and GCC OpenMP runtime.
+Initial results are given for some of the proposed interoperability functionalities, including OpenMP's wait policy,
 a new runtime feature for quiescing the OpenMP thread pool,
 and an OpenMP-based abstraction for general-purpose OS threads.
