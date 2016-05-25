@@ -101,11 +101,11 @@ void omp_set_dynamic(int dyn_threads); /*in standard already*/
 void omp_set_wait_policy(omp_thread_state_t wait_policy);
 int omp_quiesce(omp_thread_state_t state);
 \end{lstlisting}
-The {\sf omp\_set\_dynamic} is alreay in the standard. The {\sf void omp\_set\_wait\_policy (omp\_thread\_state\_t)} API
-sets the the wait-policy-var
+The {\sf omp\_set\_dynamic} is already in the standard. The {\sf void omp\_set\_wait\_policy (omp\_thread\_state\_t)} API
+sets the wait-policy-var
 ICV with one of the thread state. This will allow programmers to explicitly change the policy at various 
 points during a program's execution. An efficient implementation may use atomic write to the 
-global ICV and all threads will react accordingly at some later point of the exectution after the 
+global ICV and all threads will react accordingly at some later point of the execution after the 
 ICV is set. So the effects may be delayed. 
 The {\sf omp\_set\_wait\_policy} should only make effects to threads created from the current root thread 
 of the runtime when the parameter is one of the three:
