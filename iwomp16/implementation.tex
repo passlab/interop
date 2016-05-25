@@ -1,4 +1,7 @@
-
+The ongoing implementation was performed in both Intel OpenMP runtime (iOMP) and GNU Compiler Runtime (GOMP). The implementations for 
+the constructs for Level 0 and 1 are straightforward since they all for exposing the internal status of the runtime. In this section, 
+we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
+{\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
 In general, to implement those four functions, we follow the three steps:
 \begin{itemize}
 	\item Define this function in file “kmp{\_}csupport.c”, 
