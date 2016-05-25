@@ -2,9 +2,11 @@ Some previous studies have proposed solutions to solve the interoperability and 
 For example, Callisto~\cite{Callisto:Harris:2014:CCP:2592798.2592807} and
 Lithe~\cite{Lithe:Pan:2009:LEE:1855591.1855602} 
 address the interoperability challenge 
-through the design of a lower level software layer for common 
+through the design of a low-level software layer for common 
 resource management underneath multiple parallel runtime systems, such as OpenMP and TBB. % of programming models. 
-They however do not address the algorithm conflicts of different runtime systems. 
+%They however do not address the algorithm conflicts of different runtime systems. 
 The MPC (Multi-Processor Computing) framework~\cite{perache2008mpc} is a unified parallel runtime designed for clusters of large NUMA nodes. 
 Through process virtualization and thread-based MPI implementation, MPC enables efficient mixing of MPI, OpenMP, and Pthreads. 
+In order to compose multiple simultaneously executing parallel applications, Hugo et al.~\cite{hugo2014composing} extends the starPU runtime system to allow confined execution environments (called scheduling contexts) which can be used to partition computing resources. 
+A hypervisor is used to automatically expand or shrink contexts based on runtime resource utilization feedback. 
 
