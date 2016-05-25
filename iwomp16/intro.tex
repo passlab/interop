@@ -1,3 +1,71 @@
+\begin{comment}
+
+Applications are using multiple threading models.
+Common ones include OpenMP, POSIX threads, TBB, OpenCL.
+Now that C11 and C++11 both have threads, and C++11 has
+std::async, std::future, etc., programmers have many
+ways to create threads in a program.
+
+Libraries are written independent of applications, will use what is best
+aligned with their design, or which is most interoperable (like OS threads).
+Some libraries may need to be called from threaded region, but often not.
+
+Runtimes often use threads, but in a very different way from applications.
+Example of MPI or PGAS runtime with communication helper threads.
+OpenMP task cannot be used here since cannot use outside of parallel region.
+Runtime threads must interact with OS in deep way, so OS threads make sense.
+
+Primary problem is oversubscription of hardware threads, which causes
+major performance issues, particularly on HPC-oriented lightweight operating systems
+(e.g. IBM Blue Gene CNK).
+
+Secondary problem of affinity.
+Even if software threads do not oversubscribe hardware threads,
+are software threads running on the right set of resources at the right time.
+Best performance often achieved with affinity binding to specific resources,
+which creates oversubscription for a specific resource, even if not globally.
+
+Three approaches:
+(1) explicit thread creation
+(2) wait policy
+(3) quiesce
+
+(1) assumes every client of threads buys into it, which is not going to happen,
+even though the API is aligned with POSIX/Windows/Solaris thread APIs.
+Example of clone() for Cray XT Seastar/Portals3 in ARMCI.
+However, may be particularly useful for HPC systems, where full-blown POSIX
+threads are too much, and simple OS threading model is sufficient
+(IBM Blue Gene is a good example of this).
+MPI libraries support POSIX/Solaris/Windows threads already -- would
+not be difficult to support OpenMP abstraction for OS threads,
+at least in HPC environments.
+
+(2) wait policy causes threads to back off and potentially go to
+sleep while other threads are running.
+However, these sleeping threads are parked in the kernel and may
+still cause some OS scheduling overhead, if not sufficiently passive.
+How long before threads back off completely?
+Will this always happen before other threading model is running?
+Do sleeping threads have affinity consequences?  If pinned, possibly.
+Even Intel monitor-mwait consumes the hardware thread
+(Blue Gene interrupt/wakeup unit does not).
+Aggressive wait policy is great for interop but hurts latency.
+Have to pull all threads out of sleep for new parallel region.
+Forces application to pay tax on every fork-join when not required.
+Some OpenMP codes do lots of fork-join, and it is likely optimal to
+spin-wait in serial regions, at least for a short period, to ensure
+the lowest latency of parallel region creation.
+
+(3) is heavy hammer but allows for bulk sync phased interop, which
+is especially useful for libraries.
+Likely more expensive than most aggressive wait policy, but the cost
+of recreation is only paid after when quiesce is used explicitly, when needed.
+In some cases, quiesce may just invoke deep sleep, not actually destroy
+thread pool, but this still permits the threads to use low-latency
+wait policy between join and fork.
+
+\end{comment}
+
 Large-scale parallel applications are typically developed using multiple parallel programming models in 
 a hybrid fashion, e.g. MPI+OpenMP, and using one or mulitple prebuilt scientific and/or platform-specific libraries such as Intel Math Kernel Library (MKL)~\cite{wang2014intel}.
 Each of these programming models and libraries often has its own runtime library to handle scheduling of work units and management of computational
