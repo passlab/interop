@@ -51,34 +51,41 @@
 	\end{figure}
 	
 	Figure~\ref{omp:create_results_parallel2} and Figure~\ref{omp:create_results_parallel} show the result of the first approach (execute in parallel). It clearly shows that there is almost no differences between them. This is might be because that we are doing it inside the parallel region.However, Figure~\ref{omp:create_results_sequence2} and Figure~\ref{omp:create_results_sequence} show the result of the second approach (execute in sequence). They show that omp{\_}thread{\_}create() gives a better performance that pthread{\_}create( ). So, it would be a good feature if the user can do this instead of creating another pthread.
-	
+
+% I do not think we need these.  The performance should be relatively obvious
+% and in any case should not matter.  The purpose is to create an OS thread
+% that the OpenMP runtime is aware of, and otherwise it should be the thinnest
+% possible wrapper about the native OS thread library.
+% Because of this, I do not see how omp_thread_create can be faster than
+% pthread_create.
+%                       - Jeff
+\begin{comment}
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.7\textwidth] {images/create_results_parallel2}
 		\caption{Results of omp\_thread\_create in parallel}
 		\label{omp:create_results_parallel2}
 	\end{figure}
-	
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.7\textwidth] {images/create_results_parallel}
 		\caption{Results of omp\_thread\_create in parallel}
 		\label{omp:create_results_parallel}
 	\end{figure}
-	
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.7\textwidth] {images/create_results_sequence2}
 		\caption{Results of omp\_thread\_create in sequence}
 		\label{omp:create_results_sequence2}
 	\end{figure}
-	
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.7\textwidth] {images/create_results_sequence}
 		\caption{Results of omp\_thread\_create in sequence}
 		\label{omp:create_results_sequence}
 	\end{figure}
+\end{comment}
+
 \end{enumerate}
 
 
