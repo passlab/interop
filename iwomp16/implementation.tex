@@ -1,4 +1,4 @@
-The ongoing implementation was performed in both Intel OpenMP runtime (iOMP) and GNU Compiler Runtime (GOMP). The implementations for 
+The ongoing implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. The implementations for 
 the constructs for Level 0 and 1 are straightforward since they all for exposing the internal status of the runtime. In this section, 
 we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 {\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
@@ -7,7 +7,7 @@ environment setting for {\sf OMP\_WAIT\_POLICY} and the cooresponding ICV, the u
 use of {\sf KMP\_BLOCKTIME} and kmp\_set\_blocktime for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
 and the {\sf \_\_kmp\_internal\_end\_fini} internal API for shutting down the runtime system. 
 The implementation of  {\sf omp\_thread\_create/exit/join} needs to work around the need of a team when creating a thread, and the requirement 
-of a fork barrier and join barrier when assigning any work to a thread in the runtime. A internal team object is created when creating a thread 
+of a fork barrier and join barrier when assigning any work to a thread in the runtime. An internal team object is created when creating a thread 
 using the {\sf omp\_thread\_create} function. The implementation will first check the thread pool to find a waiting thread. If there is no thread
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
