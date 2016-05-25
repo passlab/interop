@@ -21,14 +21,38 @@ threads may be used implicitly in language concurrent features such as
 ISO C++11 \texttt{std::async} and \texttt{std::future},
 ISO Fortran 2008 \texttt{DO CONCURRENT} and coarray images\footnote{
 The Fortran standard does not specify how coarray images are implemented,
-but it surely involves either OS threads or OS processes.}.
+but it almost certainly involves either OS threads or OS processes.}.
 Both compute and runtime libraries may use threads;
 compute libraries that implement BLAS, LAPACK or FFT functions
 currently use at least four different threading models internally and
 runtime libraries such as MPI may spawn threads to implement asynchronous progress.
 Finally, in addition to multiple forms of threads, there may be multiple
 processes executing the application code on the node, the most obvious example
-of which is when MPI is used.
+of which is when MPI is used.  However, for purposes of this paper, we will consider
+consider multiprocessing differently from multiprocessing,
+due to their similarities as it pertains to interoperability problems.
+
+In cases where OpenMP is coexisting with at least one other threading model,
+we can identify at least three classes of scenarios in which to consider
+interoperability: Phased, Concurrent and Nested.
+These are illustrated in Figure~\ref{fig:interop-motif}.
+Threaded applications that call libraries that use a different threading model
+are a good example of the Phased motif.
+The thread(s) inside of e.g. an MPI library used by an OpenMP application
+matches with the Concurrent motif.
+Nested can be either OpenMP threads calling application or library
+functions that use another threading model, or the other way around.
+Of course, in all cases, the coexistence may not be as regular as
+the picture describes, but these simple cases are sufficient to reveal
+the challenges of interoperating multiple threading models.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{images/interop-motifs}
+\caption{Pictoral description of Phased, Concurrent and Nested
+motifs where two threading models must interoperate.
+\label{fig:interop-motif}
+}
+\end{figure}
 
 \begin{comment}
 
@@ -98,6 +122,7 @@ wait policy between join and fork.
 
 \end{comment}
 
+\begin{comment}
 Large-scale parallel applications are typically developed using multiple parallel programming models in 
 a hybrid fashion, e.g. MPI+OpenMP, and using one or mulitple prebuilt scientific and/or platform-specific libraries such as Intel Math Kernel Library (MKL)~\cite{wang2014intel}.
 Each of these programming models and libraries often has its own runtime library to handle scheduling of work units and management of computational
@@ -125,6 +150,8 @@ runtime instances (for the same or different high-level programming interfaces) 
 and data movement. Thus solutions to these challenges are more in the scope of runtime implementation, than in the level of programming
 interfaces and compiler transformations. 
 \TODO{I guess there might be language features enabling interoperability. Also are runtime library interfaces part of programming interfaces??}
+
+\end{comment}
 
 \REM{
 \subsection{What is an OpenMP?}
