@@ -13,10 +13,12 @@ Other portable threading models that may be used in HPC include
 POSIX threads,
 Intel\regtm{} Threading Building Blocks (TBB)~\cite{pheatt2008intel},
 %\footnote{TBB is build on top
-%of POSIX\othertm{} threads (at least on Linux\othertm{} systems), and is portable to
-%processors from AMD\othertm, ARM\othertm, IBM\othertm, Intel and other vendors.},
-ISO\othertm{} C11 and C++ threads, and
-OpenCL\othertm.
+%of POSIX threads (at least on Linux systems), and is portable to
+%processors from AMD, ARM, IBM, Intel and other vendors.},
+ISO C11 and C++ threads, and
+OpenCL.
+
+%\othertm
 
 In addition to the aforementioned explicit use of threads in HPC applications,
 threads may be used implicitly in language concurrent features such as
@@ -60,8 +62,8 @@ motifs where two threading models must interoperate.
 \begin{comment}
 
 Applications are using multiple threading models.
-Common ones include OpenMP\othertm, POSIX threads, TBB, OpenCL\othertm.
-Now that ISO\othertm C11 and C++11 both have threads, and C++11 has
+Common ones include OpenMP, POSIX threads, TBB, OpenCL.
+Now that ISO C11 and C++11 both have threads, and C++11 has
 std::async, std::future, etc., programmers have many
 ways to create threads in a program.
 
