@@ -1,0 +1,61 @@
+%\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
+
+\subsection{Use Cases of OpenMP Interoperability}
+We have identified four use cases of OpenMP interoperating with itself and other parallel programming models. 
+\subsubsection{Interacting With User threads}
+\input{userthread}
+
+\subsubsection{Two or More OpenMP Runtime Instance in A Program (Liao)}
+\input{ompomp}
+
+\subsubsection{Interacting With Other Parallel Systems or Libraries}
+\input{otherruntime}
+
+\subsubsection{Interoperability with inter-node programming model, e.g. MPI}
+\input{internode}
+
+%\subsubsection{OpenMP with native threads}
+%\subsubsection{OpenMP with TBB/MKL}
+%\subsubsection{OpenMP with parallel scientific library, such as MKL}
+%\subsubsection{Linking libraries and objects built with different OpenMP compilers}
+%\subsubsection{OpenMP with inter-node model, e.g. MPI}
+
+
+\subsection{Issues with Poor Interoperability}
+\subsubsection{CPU Oversubscription}
+\input{oversubscription}
+
+\subsubsection{Memory Overbinding (Liao)}
+
+\subsection{Limitation of Interoperability Support in the Standard}
+OpenMP currently (4.0) provides limited support for users to give hints to runtime for 
+better managing OpenMP threads and native threads, which can be used to help reducing 
+the impact of oversubscriptions.
+\paragraph{OMP\_DYNAMIC} % environment variable}
+This also includes dynvar ICV, omp\_set\_dynamic and omp\_get\_dynamic runtime routine. OMP\_DYNAMIC could be either
+{\bf true} or {\bf false}. When setting the dynvar ICV to be {\bf true}, user will expect
+OpenMP implementation to adjust the number of threads to use for executing parallel
+regions in order to optimize the use of system resources.
+
+\paragraph{OMP\_WAIT\_POLICY} %environment variable}
+This also include waitpolicyvar ICV, but no getter and setter routine. 
+OMP\_WAIT\_POLICY could be set as either ACTIVE or PASSIVE. 
+The ACTIVE value specifies that waiting threads should mostly be active, consuming processor
+ cycles, while waiting. An OpenMP implementation may, for example, make waiting threads spin.
+ The PASSIVE value specifies that waiting threads should mostly be passive, not consuming
+ processor cycles, while waiting. For example, an OpenMP implementation may make waiting
+ threads yield the processor to other threads or go to sleep.
+ The details of the ACTIVE and PASSIVE behaviors are implementation defined.
+ 
+ \paragraph{OMP\_THREAD\_LIMIT}
+ This also include threadlimitvar ICV and omp\_get\_thread\_limit getter runtime routine.
+ The environment variable sets the maximum number of OpenMP threads to use in a contention group by setting the threadlimitvar ICV.
+The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support
+
+OMP\_DYNAMIC and OMP\_THREAD\_LIMIT are approaches to
+addressing active oversubscriptions, and OMP\_WAIT\_POLICY could be used to address
+passive oversubscriptions. 
+Since there are no setters for ICVs for OMP\_WAIT\_POLICY
+and OMP\_THREAD\_LIMIT variable in the current standard, 
+dynamically changing waiting policy and the maximum number of
+threads at runtime is not available.

@@ -1,31 +1,23 @@
-\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this.}
-\subsection{Interacting With User threads}
-\input{userthread}
 
-\subsection{Interacting With Other Parallel Systems or Libraries}
-\input{otherruntime}
+%\subsubsection{Posibble Solutions and Proposals}
+The current support in OpenMP provides limited constrol on oversubscriptions, but are sufficient 
+for lots of (if not most of) scenarios if the implemention is available. In the following of this
+report, we propose solutions that will provide more
+control for oversubscription.
+\subsubsection{Change wait policy dynamically to address passive oversubscription}
+The idea is to provide a setter and getter for the wait-policy-var
+ICV. Compilers from IBM, Cray and Oracle have provide this feature~\cite{ibmwait,craywait,oraclewait}.
+There are also different variants of this features depending how much details users can configure
+the wait policy.
+\paragraph{1: {\sf omp\_set\_wait\_policy(ACTIVE$\vert$PASSIVE)} setter} for the wait-policy-var
+ICV with ACTIVE or PASSIVE. This will allow programmer to explicitly change the policy at various 
+points during a program's execution. An efficient implementation may use atomic write to the 
+global ICV and all threads will react accordingly at some later point of the exectution after the 
+ICV is set. So the effects may be delayed.
 
-\subsection{Interoperability with inter-node programming model, e.g. MPI}
-\input{internode}
-
-\subsection{Oversubscription}
-\input{oversubscription}
+\paragraph{2: Finer-grained control with new environment variables and setter routine}
 
 
-	\REM{
-\subsection{Use Cases}
-We have identified several use cases of OpenMP interoperating with itself and other parallel programming models. 
-\subsubsection{OpenMP with native threads}
-\subsubsection{OpenMP with TBB/MKL}
-\subsubsection{OpenMP with parallel scientific library, such as MKL}
-\subsubsection{Linking libraries and objects built with different OpenMP compilers}
-\subsubsection{OpenMP with inter-node model, e.g. MPI}
-
-\subsection{Issues and Possible Solutions}
-\subsubsection{Active Oversubscription}
-\subsubsection{Passive Oversubscription}
-\subsubsection{Interop across contention group}
-}
 
 There are still some challenges in terms of OpenMP interoperability. 
 OpenMP threads that are created by the parallel construct cannot interact with external systems. 
