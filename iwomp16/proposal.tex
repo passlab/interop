@@ -21,13 +21,13 @@ Thus we
 categorize interoperability functionalities into the following multiple levels: 
 \begin{itemize}
 	\item {\bf Level 0, OMP\_INTEROP\_NONE}: No interoperability. The OpenMP runtime does not provide mechanism to interoperate with others.
-	\item {\bf Level 1, OMP\_INTEROP\_INFORM}, Informational. Constructs for providing information for others about the internal status of the thread pool, memory affinity info, etc. 
+	\item {\bf Level 1, OMP\_INTEROP\_INFORM}, Informational. Constructs for providing information for others about the internal status of the thread pool, thread affinity info, etc. 
 	\item {\bf Level 2, OMP\_INTEROP\_SELF}: Self adjusting threading behavior. Constructs for
 		externals to use to adjust its internal threading and affinity behaviors.
 	\item {\bf Level 3, OMP\_INTEROP\_CONTRIBUTE}: Contributing. Constructs for externals to use to acquire OpenMP 
-		threads or place for doing user-specific tasks that are not part of the OpenMP. It also includes constructs for injecting
+		threads or places for doing user-specific tasks that are not part of the OpenMP. It also includes constructs for injecting
 		a user-specific task into the runtime. 
-	\item {\bf Level 4, OMP\_INTEROP\_REAP}: Receiving help. Consturcts for externals to attach user threads or memory affinity into the runtime.
+	\item {\bf Level 4, OMP\_INTEROP\_REAP}: Receiving help. Consturcts for externals to attach user threads into the runtime.
 \end{itemize}
 
 In each level, 
@@ -42,7 +42,7 @@ The ``{\sf int omp\_get\_interop\_level()}" procedure should be provided for que
 %An OpenMP implementation supports the desired level of interoperability and should 
 
 \subsection{Level 0, OMP\_INTEROP\_NONE}
-In this level, an OpenMP runtime should be independent from others, even with another instance of the same library. 
+In this level, an OpenMP runtime should be independent from others, even when there are multiple instances of the same runtime library. 
 %An OpenMP runtime instance should be created for each user thread that launch 
 %into OpenMP functions. 
 The thread behavior, e.g. wait policy, thread-limit, dynamic cannot be changed after the runtime started.
@@ -97,20 +97,20 @@ runtime to avoid active oversubscriptions.
 In this level, APIs are defined for adjusting the runtime behavior of the runtime, including the wait policy, dynamic feature, etc.
 
 \begin{lstlisting}[frame=single]
-void omp_set_dynamic(int dynamic_threads); /* in the standard already */
+void omp_set_dynamic(int dyn_threads); /*in standard already*/
 void omp_set_wait_policy(omp_thread_state_t wait_policy);
 int omp_quiesce(omp_thread_state_t state);
 \end{lstlisting}
-The {\sf omp\_set\_dynamic} is alreay in the standard. The {\sf void omp\_set\_wait\_policy(omp\_thread\_state\_t)} API
+The {\sf omp\_set\_dynamic} is alreay in the standard. The {\sf void omp\_set\_wait\_policy (omp\_thread\_state\_t)} API
 sets the the wait-policy-var
-ICV with one of the thread state. This will allow programmer to explicitly change the policy at various 
+ICV with one of the thread state. This will allow programmers to explicitly change the policy at various 
 points during a program's execution. An efficient implementation may use atomic write to the 
 global ICV and all threads will react accordingly at some later point of the exectution after the 
 ICV is set. So the effects may be delayed. 
 The {\sf omp\_set\_wait\_policy} should only make effects to threads created from the current root thread 
 of the runtime when the parameter is one of the three:
-{\sf omp\_thread\_state\_WAIT}, which cooresponds to the {\sf ACTIVE} wait policy, 
-{\sf omp\_thread\_state\_YIELD} which cooresonds to the {\sf PASSIVE} wait policy, or
+{\sf omp\_thread\_state\_WAIT} which corresponds to the {\sf ACTIVE} wait policy, 
+{\sf omp\_thread\_state\_YIELD} which corresponds to the {\sf PASSIVE} wait policy, or
 {\sf omp\_thread\_state\_SLEEP}. 
 %The {\sf ACTIVE} for {\sf OMP\_WAIT\_POLICY} environment variable is the same as 
 %the {\sf omp\_thread\_state\_WAIT}, and the {\sf PASSIVE} is the same as the {\sf omp\_thread\_state\_YIELD}.
