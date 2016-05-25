@@ -12,7 +12,7 @@ but should not introduce correctness issue to a program.
 %A typical OpenMP runtime creates a pool of native threads who will execute OpenMP
 % parallel regions and/or tasks. 
 
-The two scenarios we mentioned above are the two kinds of oversubscriptions we should try to avoid\footnote{Acknowledgements go to to Jeff Hammond for categorizing the twos and for introducing the two terms}:  
+The two scenarios we mentioned above are the two kinds of oversubscriptions we should try to avoid:
 {\bf 1) Active oversubscription}: Claiming or requesting more threads than 
 what are available by the system.
 {\bf 2) Passive oversubscription}: Thread resources are not released 
