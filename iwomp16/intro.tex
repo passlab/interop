@@ -16,6 +16,19 @@ of POSIX\othertm{} threads (at least on Linux\othertm{} systems), and is portabl
 processors from AMD\othertm, ARM\othertm, IBM\othertm, Intel and other vendors.},
 ISO\othertm{} C11 and C++ threads, and
 OpenCL\othertm.
+In addition to the aforementioned explicit use of threads in HPC applications,
+threads may be used implicitly in language concurrent features such as
+ISO C++11 \texttt{std::async} and \texttt{std::future},
+ISO Fortran 2008 \texttt{DO CONCURRENT} and coarray images\footnote{
+The Fortran standard does not specify how coarray images are implemented,
+but it surely involves either OS threads or OS processes.}.
+Both compute and runtime libraries may use threads;
+compute libraries that implement BLAS, LAPACK or FFT functions
+currently use at least four different threading models internally and
+runtime libraries such as MPI may spawn threads to implement asynchronous progress.
+Finally, in addition to multiple forms of threads, there may be multiple
+processes executing the application code on the node, the most obvious example
+of which is when MPI is used.
 
 \begin{comment}
 
