@@ -36,14 +36,6 @@ In cases where OpenMP is coexisting with at least one other threading model,
 we can identify at least three classes of scenarios in which to consider
 interoperability: Phased, Concurrent and Nested.
 These are illustrated in Figure~\ref{fig:interop-motif}.
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.5\textwidth]{images/interop-motifs}
-\caption{Pictoral description of Phased, Concurrent and Nested
-motifs where two threading models must interoperate.
-\label{fig:interop-motif}
-}
-\end{figure}
 Threaded applications that call libraries that use a different threading model
 are a good example of the Phased motif.
 The thread(s) inside of e.g. an MPI library used by an OpenMP application
@@ -53,7 +45,14 @@ functions that use another threading model, or the other way around.
 Of course, in all cases, the coexistence may not be as regular as
 the picture describes, but these simple cases are sufficient to reveal
 the challenges of interoperating multiple threading models.
-
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{images/interop-motifs}
+\caption{Pictoral description of Phased, Concurrent and Nested
+motifs where two threading models must interoperate.
+\label{fig:interop-motif}
+}
+\end{figure}
 
 \begin{comment}
 
