@@ -153,7 +153,7 @@ The {\sf omp\_task\_create} procedure allows users to inject non-blocking tasks 
 a thread during the execution, it only requires the runtime to launch the task and to periodically query the task internally. The non-blocking
 tasks will be part of a {\sf taskgroup}, or joining a {\sf taskwait} or {\sf barrier} synchronization. It can be used with task dependencies by 
 passing the tags for in and out dependency. A typicall use case for this API is to request OpenMP runtime to launch a non-blocking MPI call by providing the call information and a function pointer for query the completion of this task. Again, runtime only launches the tasks and then periodically
-query its status using the provided {\sf task\_test\_func}.
+query its status using the provided {\sf task\_test\_func} function pointer parameter of {\sf omp\_thread\_create}.
 
 \subsection{Level 4, OMP\_INTEROP\_REAP} 
 The philosophy of this level of interoperability support is to enable an OpenMP runtime to accept offer of threads 
