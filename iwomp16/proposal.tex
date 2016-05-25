@@ -11,18 +11,16 @@ internal hot teams in which threads are busy-waiting for work even if the progra
 So an OpenMP program could 
 consumes cycles of multiple CPU cores even if it is in sequential execution stage.
 
-This interoperability proposal attemps to address the oversubscription (both CPU and memory) challenges by providing more information or control
+This interoperability proposal attemps to address the oversubscription challenges by providing more information or control
 to users for the threads in the runtime. The proposal also provides mechanism for an OpenMP runtime to interact with externals, including 
 contributing OpenMP threads for another parallel runtime, for processing tasks such as message passing that are not computational, or for receiving
 help from user threads to do OpenMP work. We also observed that a highly-interoperable OpenMP proposal is 
 complex for both the usage and implementation of those features. It introduces
 overheads that may not be necessnary for a program that does not need to interoperate in that degree of interoperability. 
-Thus our principle to support OpenMP interoperability is by 
-categorizing interoperability functionalities into multiple levels. In each level, 
-OpenMP constructs (directives, runtime APIs and environment variables) are defined to support the interoperability 
-requirements. 
+Thus we
+categorize interoperability functionalities into the following multiple levels: 
 \begin{itemize}
-	\item {\bf Level 0, OMP\_INTEROP\_NONE}: No interoperability. The OpenMP runtime do not provide mechanism to interoperate with others.
+	\item {\bf Level 0, OMP\_INTEROP\_NONE}: No interoperability. The OpenMP runtime does not provide mechanism to interoperate with others.
 	\item {\bf Level 1, OMP\_INTEROP\_INFORM}, Informational. Constructs for providing information for others about the internal status of the thread pool, memory affinity info, etc. 
 	\item {\bf Level 2, OMP\_INTEROP\_SELF}: Self adjusting threading behavior. Constructs for
 		externals to use to adjust its internal threading and affinity behaviors.
@@ -32,6 +30,9 @@ requirements.
 	\item {\bf Level 4, OMP\_INTEROP\_REAP}: Receiving help. Consturcts for externals to attach user threads or memory affinity into the runtime.
 \end{itemize}
 
+In each level, 
+OpenMP constructs (directives, runtime APIs and environment variables) are defined to support the interoperability 
+requirements. 
 An OpenMP implementation that supports a certain level of interoperability should provide the implementation of all the APIs
 from level 0 to that level inclusively. 
 An environment variable, {\sf OMP\_INTEROP\_LEVEL}, is defined to set the desired level of 
