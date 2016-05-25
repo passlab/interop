@@ -39,32 +39,79 @@ The ``{\sf int omp\_get\_interop\_level()}" procedure should be provided for que
 %An OpenMP implementation supports the desired level of interoperability and should 
 
 \subsection{Level 0, OMP\_INTEROP\_NONE}
-In this level, an OpenMP runtime should be independent from others, even another instance of the same library. 
+In this level, an OpenMP runtime should be independent from others, even with another instance of the same library. 
 An OpenMP runtime instance should be created for each user thread that launch 
-into OpenMP functions. 
-\subsection{Level 1, OMP\_INTEROP\_INFORM} 
-\subsection{Level 2, OMP\_INTEROP\_SELF} 
-\subsection{Level 3, OMP\_INTEROP\_CONTRIBUTE} 
-\subsection{Level 4, OMP\_INTEROP\_RECEIVE} 
+into OpenMP functions. The thread behavior, e.g. wait policy, thread-limit, dynamic cannot be changed after the runtime started.
+The runtime takes the values of those variables from environment variables. The implementation supporting 
+this level should implement the following  
+environment variables and some getter functions. 
+\lstset{basicstyle=\sffamily\footnotesize,language=c, numbersep=1pt}
+\begin{lstlisting}[frame=single]  % Start your code-block
 
-%\subsubsection{Posibble Solutions and Proposals}
-The current support in OpenMP provides limited constrol on oversubscriptions, but are sufficient 
-for lots of (if not most of) scenarios if the implemention is available. In the following of this
-report, we propose solutions that will provide more
-control for oversubscription.
-\subsubsection{Change wait policy dynamically to address passive oversubscription}
-The idea is to provide a setter and getter for the wait-policy-var
-ICV. Compilers from IBM, Cray and Oracle have provide this feature~\cite{ibmwait,craywait,oraclewait}.
-There are also different variants of this features depending how much details users can configure
-the wait policy.
-\paragraph{1: {\sf omp\_set\_wait\_policy(ACTIVE$\vert$PASSIVE)} setter} for the wait-policy-var
-ICV with ACTIVE or PASSIVE. This will allow programmer to explicitly change the policy at various 
+OMP_DYNAMIC                     /* in the standard already */
+OMP_WAIT_POLICY                 /* in the standard already */
+OMP_THREAD_LIMIT                /* in the standard already */
+int omp_get_dynamic(void);      /* in the standard already */
+int omp_get_thread_limit(void); /* in the standard already */
+int omp_get_wait_policy(void);
+int omp_get_num_procs(void);    /* in the standard already */
+\end{lstlisting}
+Those constructs except, the {\sf omp\_get\_wait\_policy} API, are already in the standard. 
+
+\subsection{Level 1, OMP\_INTEROP\_INFORM}
+This level defines APIs for users to query the internal status of the runtime, including the size of thread pool, the number of threads
+that are busy-waiting, yielding or sleeping. The status of a thread includes RUN, WAIT, YIELD, SLEEP, KILL, and BLOCK. 
+
+\lstset{basicstyle=\sffamily\small,language=c, numbersep=1pt}
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+typedef enum omp_thread_state {
+  omp_thread_state_RUN = 0,     /* doing useful work */
+  omp_thread_state_WAIT = 1,    /* busy waiting for work */
+  omp_thread_state_YIELD = 2,   /* yield the CPU */
+  omp_thread_state_SLEEP = 3,   /* sleeping */
+  omp_thread_state_KILL = 4,    /* being killed */
+  omp_thread_state_BLOCK = 5,   /* blocked waiting */
+} omp_thread_state_t; 
+int omp_get_num_threads_runtime(omp_thread_state_t state);
+\end{lstlisting}
+
+By using the API, a program would be able to claims or allocate appropriate amount of resources based on how many are occupied by the OpenMP
+runtime to avoid active oversubscriptions. 
+
+\subsection{Level 2, OMP\_INTEROP\_SELF} 
+In this level, APIs are defined for adjusting the runtime behavior of the runtime, including the wait policy, dynamic feature, etc.
+
+\begin{lstlisting}[frame=single]
+void omp_set_dynamic(int dynamic_threads); /* in the standard already */
+void omp_set_wait_policy(omp_thread_state_t wait_policy);
+int omp_quiesce(omp_thread_state_t state);
+\end{lstlisting}
+The {\sf omp\_set\_dynamic} is alreay in the standard. The {\sf void omp\_set\_wait\_policy(omp\_thread\_state\_t)} API
+sets the the wait-policy-var
+ICV with one of the thread state. This will allow programmer to explicitly change the policy at various 
 points during a program's execution. An efficient implementation may use atomic write to the 
 global ICV and all threads will react accordingly at some later point of the exectution after the 
-ICV is set. So the effects may be delayed.
+ICV is set. So the effects may be delayed. 
+The {\sf omp\_set\_wait\_policy} should only make effects to threads created from the current root thread 
+of the runtime when the parameter is one of the three:
+{\sf omp\_thread\_state\_WAIT}, which cooresponds to the {\sf ACTIVE} wait policy, 
+{\sf omp\_thread\_state\_YIELD} which cooresonds to the {\sf PASSIVE} wait policy, or
+{\sf omp\_thread\_state\_SLEEP}. 
+%The {\sf ACTIVE} for {\sf OMP\_WAIT\_POLICY} environment variable is the same as 
+%the {\sf omp\_thread\_state\_WAIT}, and the {\sf PASSIVE} is the same as the {\sf omp\_thread\_state\_YIELD}.
+Compilers from IBM, Cray and Oracle have provide this feature~\cite{ibmwait,craywait,oraclewait}.
+There are also different variants of this features depending how much details users can configure
+the wait policy.
 
-\paragraph{2: Finer-grained control with new environment variables and setter routine}
+The {\sf omp\_quiesce} routine quiesces all OpenMP threads of the runtime according to specified threading behavior by the parameter. The
+parameter could be either WAIT, YIELD, SLEEP, or KILL. Quiescence may involve termination
+ of threads or otherwise inactivating them. The routine returns zero if quiescence has been achieved, otherwise it returns a non-zero error code.
 
+The two APIs allow a program to dynamically change the behavior of waiting threads or even shutdown the runtime, thus addressing the passive
+oversubscription issue. 
+\subsection{Level 3, OMP\_INTEROP\_CONTRIBUTE} 
+\subsection{Level 4, OMP\_INTEROP\_RECEIVE} 
 
 
 There are still some challenges in terms of OpenMP interoperability. 
