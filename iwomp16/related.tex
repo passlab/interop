@@ -15,4 +15,8 @@ proposal to the MPI standard relaxes the one-to-one relationship between process
 It allows registering a thread in an MPI
 process as a MPI communicator rank that is able to independently paraticipate
 in message passing operations. There are also efforts of integrating MPI calls as
-tasks in a intra-node workstealing runtime~\cite{hcmpi:ipdps13} .
+tasks in a intra-node workstealing runtime~\cite{hcmpi:ipdps13}.
+
+Epperly et al.~\cite{epperly2011composite} proposed a mixed-language environment supporting arbitrary combination of software written in PGAS languages (Co-Array Fortran, UPC, and Titanium) and HPCS languages (Chapel, X10, and Fortress). 
+They designed the Scientfic Interface Definition Laguage (SIDL) and Babel Intermediate Object Representation (IOR) as a language-independent object-oriented programming model and type system
+to allow software components to share complicated data structures across various languages. 
