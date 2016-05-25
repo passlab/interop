@@ -4,7 +4,7 @@ threads available when entering a parallel region, which causes excessive compet
 among OpenMP threads for hardware threads and increases runtime overhead. 
 When program execution enters into sequential stage after exiting a parallel region, 
 those native threads that support the OpenMP threads in the parallel region may still 
-alive in the background consuming CPU cycles but not doing actual work for users. This 
+alive in the background consuming CPU cycles. This 
 will make those hardware threads unavailable to others. 
 Oversubscription impact the performance of an applications and the system, 
 but should not introduce correctness issue to a program. 
