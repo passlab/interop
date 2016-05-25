@@ -31,15 +31,15 @@ currently use at least four different threading models internally and
 runtime libraries such as MPI may spawn threads to implement asynchronous progress.
 Finally, in addition to multiple forms of threads, there may be multiple
 processes executing the application code on the node, the most obvious example
-of which is when MPI is used.  However, for purposes of this paper, we will 
-consider multiprocessing differently from multithreading,
+of which is when MPI is used.  However, for purposes of this paper, we will
+not consider multiprocessing differently from multithreading,
 due to their similarities as it pertains to interoperability problems.
 
 In cases where OpenMP is coexisting with at least one other threading model,
 we can identify at least three classes of scenarios in which to consider
 interoperability: Phased, Concurrent and Nested.
 These are illustrated in Figure~\ref{fig:interop-motif}.
-Threaded applications that call libraries that use a different threading model
+Threaded applications that call threaded libraries from a sequential region
 are a good example of the Phased motif.
 The thread(s) inside of e.g. an MPI library used by an OpenMP application
 matches with the Concurrent motif.

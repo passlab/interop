@@ -1,17 +1,20 @@
 %\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
-
-\subsection{Use Cases of OpenMP Interoperability}
-We have identified four use cases of OpenMP interoperating with itself and other parallel programming models. 
+In this section, we study the interoperability challenges, and motivate our proposal. 
+We identified three types of use cases of interoperating OpenMP with itself and other parallel programming models as part of OpenMP Interoperability
+Subcommittee. CPU oversubscription and affinity conflication are the two major performance challenges we identified
+when multiple parallel libraries do not interoperate well with each other. We then discuss the limitations of the current standard to support 
+interoperability. 
+\subsection{Three Types of Use Cases} % of OpenMP Interoperability}
 \subsubsection{Interacting With User threads}
 \input{userthread}
 
-\subsubsection{Interacting with Other OpenMP Programs}
-\input{ompomp}
+%\subsubsection{Interacting with Other OpenMP Programs}
+%\input{ompomp}
 
-\subsubsection{Interacting With Other Parallel Systems or Libraries}
+\subsubsection{Interacting With Other Parallel Libraries}
 \input{otherruntime}
 
-\subsubsection{Interacting with inter-node programming model, e.g. MPI}
+\subsubsection{Interoperability With Inter-node Model, e.g. MPI}
 \input{internode}
 
 %\subsubsection{OpenMP with native threads}
