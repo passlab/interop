@@ -124,8 +124,11 @@ parameter could be either WAIT, YIELD, SLEEP, or KILL. Quiescence may involve te
 
 The two APIs allow a program to dynamically change the behavior of waiting threads or even shutdown the runtime, thus addressing the passive
 oversubscription issue. 
+
+
 \subsection{Level 3, OMP\_INTEROP\_CONTRIBUTE}
-The APIs in this level mean to contribute the resources owned by the OpenMP for operations that are not easy to perform using OpenMP directives.  
+The APIs in this level mean to contribute the resources owned by an OpenMP runtime to externals. 
+% for operations that are not easy to describe using OpenMP directives.  
 
 \lstset{basicstyle=\sffamily\small,language=c, numbersep=1pt}
 \begin{lstlisting}[frame=single]  % Start your code-block
@@ -144,17 +147,17 @@ The {\sf omp\_thread\_create/exit/join} APIs are for creating OpenMP threads sim
 as PThreads. The {\sf place} parameter is used for specifying the place where the thread should be created from.  
 By using those APIs, an OpenMP thread
 can be used as regular thread without using OpenMP parallel region. Those threads can be used to form another parallel runtime for other programming
-models, but also being tracked by the OpenMP runtime, but not belong to any team. 
+models, but also being tracked by the OpenMP runtime, but not belong to any thread team. 
 
 The {\sf omp\_task\_create} procedure allows users to inject non-blocking tasks into the OpenMP runtime. A non-blocking task does not occupy
 a thread during the execution, it only requires the runtime to launch the task and to periodically query the task internally. The non-blocking
 tasks will be part of a {\sf taskgroup}, or joining a {\sf taskwait} or {\sf barrier} synchronization. It can be used with task dependencies by 
-passing the tags for in and out dependency. A typicall use case for this API is to request OpenMP runtime to launch a non-blocking MPI call by providing the call information and a function pointer for query the completion of this task. Again, runtime only launchs the tasks and then periodically
+passing the tags for in and out dependency. A typicall use case for this API is to request OpenMP runtime to launch a non-blocking MPI call by providing the call information and a function pointer for query the completion of this task. Again, runtime only launches the tasks and then periodically
 query its status using the provided {\sf task\_test\_func}.
 
 \subsection{Level 4, OMP\_INTEROP\_REAP} 
 The philosophy of this level of interoperability support is to enable an OpenMP runtime to accept offer of threads 
-for helping the OpenMP execution. This is different than the approach of claiming CPU cores 
+for helping its own execution. This is different than the approach of claiming CPU cores 
 for computation using the standard parallel region creation. By allowing program to offer threads to the runtime who needs it, we are able to 
 reap the resources for computation, thus reducing the overhead of thread creation and context switching when otherwise 
 a thread has to be terminated from
