@@ -10,3 +10,9 @@ Through process virtualization and thread-based MPI implementation, MPC enables 
 In order to compose multiple simultaneously executing parallel applications, Hugo et al.~\cite{hugo2014composing} extends the starPU runtime system to allow confined execution environments (called scheduling contexts) which can be used to partition computing resources. 
 A hypervisor is used to automatically expand or shrink contexts based on runtime resource utilization feedback. 
 
+The MPI endpoints~\cite{Dinan:mpiendpoint_eurompi13}
+proposal to the MPI standard relaxes the one-to-one relationship between processes and ranks.
+It allows registering a thread in an MPI
+process as a MPI communicator rank that is able to independently paraticipate
+in message passing operations. There are also efforts of integrating MPI calls as
+tasks in a intra-node workstealing runtime~\cite{hcmpi:ipdps13} .
