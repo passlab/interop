@@ -4,5 +4,5 @@ So the provided global environment variables should work properly to set the int
 of the OpenMP program. 
 However, this causes problem when multiple OpenMP programs are running at the same time within a computation node. 
 Environment variables affecting resource allocation will uniquely impact all OpenMP programs, which is often not desired.
-For example, unless runtime library routines are explicitly used to customize each program's choices, \lstinline{OMP_NUM_THREADS}, \lstinline{OMP_PROC_BIND}, \lstinline{OMP_DEFAULT_DEVICE} will
+For example, unless runtime library routines are explicitly used to customize each program's choices, \lstinline{OMP_NUM_THREADS}, \lstinline{OMP_PROC_BIND}, \lstinline{OMP_DEFAULT_DEVICE} may 
 make all OpenMP runtime instances use the same number of threads, the same affinity, and the same accelerator device, respectively. 
