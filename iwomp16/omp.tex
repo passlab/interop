@@ -26,6 +26,10 @@
 \usepackage{color}
 \newcommand {\TODO}[1]{\textcolor{red}{TODO #1}}
 
+\newcommand{\othertm}{\textsuperscript{$\star$}}
+\newcommand{\regtm}{\textsuperscript{\textregistered{}}}
+\newcommand{\tm}{{\scriptsize\texttrademark{}}}
+
 %\newcommand{\descheader}[1]{{\needspace{3\baselineskip}\vspace{1em}\noindent \fbox{#1}}}
 
 
@@ -41,19 +45,23 @@
 %                                     also used for the TOC unless
 %                                     \toctitle is used
 %
-\author{Yonghong Yan\inst{1} \and Jeff Hammond\inst{???} \and Ali Alqazzaz\inst{1}  \and Chunhua Liao\inst{2} \and Other OpenMP Interoperability Language Subcommittee Members}
+\author{
+    Yonghong Yan\inst{1} \and
+    Jeff Hammond\inst{2} \and
+    Ali Alqazzaz\inst{1} \and
+    Chunhua Liao\inst{3} \and
+    Other OpenMP Interoperability Language Subcommittee Members
+}
 
-%
-%\authorrunning{Ivar Ekeland et al.}   % abbreviated author list (for running head)
-%
-%%%% list of authors for the TOC (use if author list has to be modified)
-%\tocauthor{Ivar Ekeland, Roger Temam, Jeffrey Dean, David Grove,
-%Craig Chambers, Kim B. Bruce, Elisa Bertino}
-%
-\institute{Department of Computer Science, Oakland University\\
-\email{\{yan,aalqazzaz\}@oakland.edu}
-\and Center for Applied Scientific Computing, Lawrence Livermore National Laboratory\\
-\email{liao6@llnl.gov}
+\institute{
+    Department of Computer Science, Oakland University\\
+    \email{\{yan,aalqazzaz\}@oakland.edu}
+    \and
+    Parallel Computing Lab, Intel Corp.\\
+    \email{jeff\_hammond@acm.org}
+    \and
+    Center for Applied Scientific Computing, Lawrence Livermore National Laboratory\\
+    \email{liao6@llnl.gov}
 }
 \maketitle              % typeset the title of the contribution
 
