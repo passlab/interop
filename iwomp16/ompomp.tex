@@ -1,0 +1,8 @@
+Often a parallel machine is shared by users running multiple programs at the same time.
+It is very likly that multiple OpenMP programs coexist within the same computation node. 
+Current, an OpenMP implementation assumes that it fully occupies the entire computation node,
+without considering the possibility of existence of other running OpenMP programs. 
+This can cause problems such as resource contention and oversubscription.
+
+Ideally, each running OpenMP program should register its resource utilizations with a node-wide registry.
+Then another OpenMP program can query the registry and decide its own resource utilization strategy accordingly. 
