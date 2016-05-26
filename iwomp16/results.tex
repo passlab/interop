@@ -12,6 +12,14 @@ The cost of creating a parallel region is very light because of the use of inter
 
 %because the OpemMP just creates that once. Then, it puts them in a global thread pool to be used next time needed. However, the time cost represented by the quiesce term refers to the time required to shutdown the whole runtime library. In other words, after each parallel region we remove all threads in the global thread pool. Finally, the startup{\_}quiesce term implies the time required to initialize the parallel region and the time taken to shutdown the runtime library. 
 
+% FUSED FIGURE
+\begin{figure}[ht]
+    \includegraphics[width=1.0\textwidth] {images/omp_quiesce_fusion}
+    \caption{{\sf omp\_quiesce} evaluation.\label{omp:quiesce_evaluation} }
+\end{figure}
+
+% ORIGINAL FIGURE
+\begin{comment}
 %\vspace{-0.6cm}
 \begin{figure}[ht]
 \subfigure[Test Design]{
@@ -26,6 +34,7 @@ The cost of creating a parallel region is very light because of the use of inter
 \label{fig:quiesce}
 \end{figure}
 %\vspace{-0.4cm}
+\end{comment}
 
 
 \REM{
