@@ -1,17 +1,19 @@
 %\textbf{Definition}
-We define a user thread in a program as a thread that is not created by an OpenMP implementation. 
+A user thread in a program is the thread that is explicitly created in the program by user, for examples PThreads or Windows Native threads created 
+using POSIX or Win32 APIs, or Java or C++11 threads. 
+%implementation. 
 %A user thread 
 %could become an OpenMP initial thread. 
-The most common examples of user threads are POSIX Threads (PThreads) on POSIX-compliant Unix/Linux systems, 
+%The most common examples of user threads are POSIX Threads (PThreads) on POSIX-compliant Unix/Linux systems, 
 %There are also implementations of other thread libraries, 
 %for example, 
-Windows Native threads and language based threading support such as Java threads, C++11 threads and futures, as well as others such as qthreads. 
-Most OpenMP implementations do not consider the existence of user threads in the OpenMP runtime scheduling and resource managements. 
-The existence of multiple user threads in an OpenMP program adds additional level(s) in the overall ``threading''
+%Windows Native threads and language based threading support such as Java threads, C++11 threads and futures, as well as others such as qthreads. 
+Most OpenMP implementations ignore those user threads in the decision making for runtime scheduling and resource management. 
+The existence of multiple user threads adds additional level(s) in the overall ``threading''
 hierarchy of a program. % Those additional levels could be on top of OpenMP threading mechanism when 
 A user thread could become an OpenMP initial thread that creates OpenMP thread
 parallelism, or beneath the OpenMP threading mechanism when an OpenMP thread spawns 
-a user thread, or the the mix of both. 
+a user thread, or the mix of both. 
 
 These additional levels of threading increase the complexity of a program, both for 
 users in the aspect of reasoning the parallel and synchronization behaviors of a program, 
