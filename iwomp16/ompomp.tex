@@ -1,14 +1,14 @@
 Often a parallel machine is shared by users running multiple programs at the same time.
-It is very likly that multiple OpenMP programs coexist within the same computation node. 
+It is very likely that multiple OpenMP programs coexist within the same computation node. 
 The OpenMP programs can be compiled by a same OpenMP compiler or different compilers. 
-Current, an OpenMP implementation, including its runtime, assumes that it fully occupies the entire computation node,
-without considering the possibility of existence of other running OpenMP programs and their supportive OpenMP runtime instances. 
-The coexistence of multiple OpenMP runtime instances raises the following questions:
+%Currently, an OpenMP implementation, including its runtime, often assumes that it fully occupies the entire computation node,
+%without considering the possibility of existence of other running OpenMP programs and their supportive OpenMP runtime instances. 
+The coexistence of multiple OpenMP programs raises the following questions:
 \begin{itemize}
-\item How many OpenMP programs are running currently?
-\item Which OpenMP runtime system is being used by a running OpenMP program?
+\item How many OpenMP programs are running on a given node currently?
+%\item Which OpenMP runtime system is being used by a running OpenMP program?
 \item What resources are used by each of them?
-\item How do the concurrently executing OpenMP programs interact with each others to ensure optimal resource utilization?
-\item OpenMP environment variables have global impact on all runtime instances. Is this the desired behavior we want?
+\item How to ensure optimal resource utilization and avoid contentions?
+%\item OpenMP environment variables have global impact on all runtime instances. Is this the desired behavior we want?
 \end{itemize}
 
