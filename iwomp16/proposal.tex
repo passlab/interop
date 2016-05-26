@@ -143,7 +143,7 @@ The {\sf omp\_thread\_create/exit/join} APIs are for creating OpenMP threads sim
 as PThreads. The {\sf place} parameter is used for specifying the place where the thread should be created from.  
 By using those APIs, an OpenMP thread
 can be used as regular thread without using OpenMP parallel region. Those threads can be used to form another parallel runtime for other programming
-models, but also being tracked by the OpenMP runtime. 
+models, but also being tracked by the OpenMP runtime, but not belong to any team. 
 
 The {\sf omp\_task\_create} procedure allows users to inject non-blocking tasks into the OpenMP runtime. A non-blocking task does not occupy
 a thread during the execution, it only requires the runtime to launch the task and to periodically query the task internally. The non-blocking
