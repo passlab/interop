@@ -2,7 +2,7 @@ Some previous studies have studied the interoperability and composibility of par
 Tian et al.~\cite{tian2003compiler} explored interoperability between OpenMP threads and system threads (e.g. pthreads and WinThreads) in Intel OpenMP compilers.
 For ease of use for programmers, they decided not to share thread identifiers between system threads and their OpenMP parent
 and not to share threadprivate variables among system threads.
-Also, a forked system thread would return false if it calls \lstinline{omp_in_parallel()}, even if it is created by an OpenMP thread. 
+Also, a forked system thread calling \lstinline{omp_in_parallel()} would return false, even if it is created by an OpenMP thread. 
 
 Callisto~\cite{Callisto:Harris:2014:CCP:2592798.2592807} and
 Lithe~\cite{Lithe:Pan:2009:LEE:1855591.1855602} 
