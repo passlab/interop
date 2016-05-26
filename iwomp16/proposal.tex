@@ -1,19 +1,21 @@
 %Parallel programming models such as 
 OpenMP has been evolved to be a comprehensive programming model for parallel and heterogeneous computing nodes by including 
 data parallelism, task parallelism, offloading execution model, etc. in one unified model. 
-The runtime systems are becoming more complicated than before support those language features.
+The runtime systems are becoming more complicated than before to support those language features.
 A typical OpenMP runtime maintains an internal thread pool to keep tracking those threads allocated by the runtime even they are not  
 doing any OpenMP operation during the sequential execution of the program. 
 A thread in the thread pool could be in either busy-waiting state which occupies a CPU core, or in the kernel
-scheduling queue after a yield system call (e.g. {\em sched\_yield} in Linux), or could be put to sleep. Some OpenMP runtime also maintains
-internal hot teams of which threads are busy-waiting for work even if the program is in the sequential stage. So an OpenMP program could 
+scheduling queue after a yield system call (e.g. {\em sched\_yield} in Linux), or could be put to sleep. 
+Some OpenMP runtime also maintains
+internal hot teams in which threads are busy-waiting for work even if the program is in the sequential stage. 
+So an OpenMP program could 
 consumes cycles of multiple CPU cores even if it is in sequential execution stage.
 
 This interoperability proposal attemps to address the oversubscription (both CPU and memory) challenges by providing more information or control
 to users for the threads in the runtime. The proposal also provides mechanism for an OpenMP runtime to interact with externals, including 
 contributing OpenMP threads for another parallel runtime, for processing tasks such as message passing that are not computational, or for receiving
-help from user threads to do OpenMP work. We also observed that a highly-interoperable OpenMP implementation are 
-complicated for both the usage and implementation of those features. It introduces
+help from user threads to do OpenMP work. We also observed that a highly-interoperable OpenMP proposal is 
+complex for both the usage and implementation of those features. It introduces
 overheads that may not be necessnary for a program that does not need to interoperate in that degree of interoperability. 
 Thus our principle to support OpenMP interoperability is by 
 categorizing interoperability functionalities into multiple levels. In each level, 
@@ -30,7 +32,7 @@ requirements.
 	\item {\bf Level 4, OMP\_INTEROP\_REAP}: Receiving help. Consturcts for externals to attach user threads or memory affinity into the runtime.
 \end{itemize}
 
-An OpenMP implementation that supports the certain level of interoperability should provide the implementation of all the APIs
+An OpenMP implementation that supports a certain level of interoperability should provide the implementation of all the APIs
 from level 0 to that level inclusively. 
 An environment variable, {\sf OMP\_INTEROP\_LEVEL}, is defined to set the desired level of 
 interoperability for an OpenMP program. The actual level during execution depends on both the value of 
