@@ -1,6 +1,6 @@
 High-performance computing (HPC) applications must exploit parallelism
 in order to take advantage of all of the hardware resources of
-modern multicore nodes, potentially with some form of heterogeneity.
+modern multicore nodes, potentially with some form of heterogeneity
 (e.g. specialized coprocessors).
 Obviously, there are a number of ways to map algorithmic concurrency
 to hardware parallelism, which on general purpose processors rely
@@ -11,32 +11,35 @@ OpenMP is the most popular programming model for multithreading in HPC,
 although it is far from the only one.
 Other portable threading models that may be used in HPC include
 POSIX threads,
-Intel\regtm{} Threading Building Blocks (TBB)\footnote{TBB is build on top
-of POSIX\othertm{} threads (at least on Linux\othertm{} systems), and is portable to
-processors from AMD\othertm, ARM\othertm, IBM\othertm, Intel and other vendors.},
+Intel\regtm{} Threading Building Blocks (TBB)~\cite{pheatt2008intel},
+%\footnote{TBB is build on top
+%of POSIX\othertm{} threads (at least on Linux\othertm{} systems), and is portable to
+%processors from AMD\othertm, ARM\othertm, IBM\othertm, Intel and other vendors.},
 ISO\othertm{} C11 and C++ threads, and
 OpenCL\othertm.
+
 In addition to the aforementioned explicit use of threads in HPC applications,
 threads may be used implicitly in language concurrent features such as
 ISO C++11 \texttt{std::async} and \texttt{std::future},
-ISO Fortran 2008 \texttt{DO CONCURRENT} and coarray images\footnote{
-The Fortran standard does not specify how coarray images are implemented,
-but it almost certainly involves either OS threads or OS processes.}.
+ISO Fortran 2008 \texttt{DO CONCURRENT} and coarray images.
+%\footnote{
+%The Fortran standard does not specify how coarray images are implemented,
+%but it almost certainly involves either OS threads or OS processes.}.
 Both compute and runtime libraries may use threads;
 compute libraries that implement BLAS, LAPACK or FFT functions
 currently use at least four different threading models internally and
 runtime libraries such as MPI may spawn threads to implement asynchronous progress.
 Finally, in addition to multiple forms of threads, there may be multiple
 processes executing the application code on the node, the most obvious example
-of which is when MPI is used.  However, for purposes of this paper, we will consider
-consider multiprocessing differently from multiprocessing,
+of which is when MPI is used.  However, for purposes of this paper, we will
+not consider multiprocessing differently from multithreading,
 due to their similarities as it pertains to interoperability problems.
 
 In cases where OpenMP is coexisting with at least one other threading model,
 we can identify at least three classes of scenarios in which to consider
 interoperability: Phased, Concurrent and Nested.
 These are illustrated in Figure~\ref{fig:interop-motif}.
-Threaded applications that call libraries that use a different threading model
+Threaded applications that call threaded libraries from a sequential region
 are a good example of the Phased motif.
 The thread(s) inside of e.g. an MPI library used by an OpenMP application
 matches with the Concurrent motif.
