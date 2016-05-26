@@ -1,7 +1,7 @@
 %\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
 In this section, we study the interoperability challenges, and motivate our proposal. 
 We identified three types of use cases of interoperating OpenMP with itself and other parallel programming models as part of OpenMP Interoperability
-Subcommittee. CPU oversubscription and affinity conflication are the two major performance challenges we identified
+Subcommittee. CPU oversubscription and affinity confliction are the two major performance challenges we identified
 when multiple parallel libraries do not interoperate well with each other. We then discuss the limitations of the current standard to support 
 interoperability. 
 \subsection{Three Types of Use Cases} % of OpenMP Interoperability}
@@ -48,7 +48,7 @@ for performance when mapping computation and data to CPUs and memory.
 \subsection{Limitation of Interoperability Support in the Standard}
 OpenMP currently (4.5) provides limited support for users to give hints to runtime for 
 better managing OpenMP threads and native threads, which can be used to help reducing 
-the impact of oversubscriptions.
+the impact of oversubscription.
 First, the use of {\sf OMP\_DYNAMIC} group of constructs, which includes the environment variable, 
 the {\sf dyn-var} ICV, {\sf omp\_set\_dynamic} and {\sf omp\_get\_dynamic} runtime routine,
 expects the OpenMP implementation to be capable of adjusting the number of threads to use for executing parallel
@@ -65,7 +65,7 @@ oversubscription issue. The standard however only allows one time setting of the
 preventing the dynamic adjustment of thread waiting behavior during the execution. 
 
 Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment, {\sf thread-limit-var} ICV and the {\sf omp\_get\_thread\_limit} getter give users an option to  
- set the maximum number of OpenMP threads to use in a contention group when the program starts, addressing oversubscriptions issues in certain
+ set the maximum number of OpenMP threads to use in a contention group when the program starts, addressing oversubscription issues in certain
  degree. It however also does not provide setter to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
  its actually effects in real applications. 
 % by setting the threadlimitvar ICV.
@@ -94,13 +94,13 @@ from the language standard, and should be left to users to deal with them.
 % The details of the ACTIVE and PASSIVE behaviors are implementation defined.
  
  \paragraph{OMP\_THREAD\_LIMIT}
- This also include threadlimitvar ICV and omp\_get\_thread\_limit getter runtime routine.
- The environment variable sets the maximum number of OpenMP threads to use in a contention group by setting the threadlimitvar ICV.
+ This also include thread-limit-var ICV and omp\_get\_thread\_limit getter runtime routine.
+ The environment variable sets the maximum number of OpenMP threads to use in a contention group by setting the thread-limit-var ICV.
 The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support
 
 OMP\_DYNAMIC and OMP\_THREAD\_LIMIT are approaches to
-addressing active oversubscriptions, and OMP\_WAIT\_POLICY could be used to address
-passive oversubscriptions. 
+addressing active oversubscription, and OMP\_WAIT\_POLICY could be used to address
+passive oversubscription. 
 Since there are no setters for ICVs for OMP\_WAIT\_POLICY
 and OMP\_THREAD\_LIMIT variable in the current standard, 
 dynamically changing waiting policy and the maximum number of
@@ -116,7 +116,7 @@ the callee. Typical interoperability issues include the following examples:
 \item For user threads that use the same OpenMP runtime library, does the user threads each create its own runtime instance or they share one?
 \item For user threads each of which has its own runtime instance (from the same or 
 	different runtime library), how to coordinate the resource management among those
-	runtime instances to address such issues as oversubscriptions and the affinity
+	runtime instances to address such issues as oversubscription and the affinity
 	between user threads?
 \end{itemize}
 %\TODO{What if a user thread does not use any OpenMP runtime at all? }

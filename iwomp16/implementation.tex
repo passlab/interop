@@ -3,8 +3,8 @@ the constructs for Level 0 and 1 are straightforward since they all for exposing
 we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 {\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
 For iOMP, the implementation of {\sf omp\_set\_wait\_policy} and {\sf omp\_quiesce} leverages the support for {\sf ACTIVE} and {\sf PASSIVE}
-environment setting for {\sf OMP\_WAIT\_POLICY} and the cooresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
-use of {\sf KMP\_BLOCKTIME} and kmp\_set\_blocktime for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
+environment setting for {\sf OMP\_WAIT\_POLICY} and the corresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
+use of {\sf KMP\_BLOCKTIME} and {\sf kmp\_set\_blocktime} for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
 and the {\sf \_\_kmp\_internal\_end\_fini} internal API for shutting down the runtime system. 
 The implementation of  {\sf omp\_thread\_create/exit/join} needs to work around the need of a team when creating a thread, and the requirement 
 of a fork barrier and join barrier when assigning any work to a thread in the runtime. An internal team object is created when creating a thread 

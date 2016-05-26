@@ -4,10 +4,10 @@ modern multicore nodes, potentially with some form of heterogeneity
 (e.g. specialized coprocessors).
 Obviously, there are a number of ways to map algorithmic concurrency
 to hardware parallelism, which on general purpose processors rely
-upon either multithreading or multiprocessing, which are different
+upon either multi-threading or multiprocessing, which are different
 from the user perspective but very similar from the perspective of
 the operating system and hardware.
-OpenMP is the most popular programming model for multithreading in HPC,
+OpenMP is the most popular programming model for multi-threading in HPC,
 although it is far from the only one.
 Other portable threading models that may be used in HPC include
 POSIX threads,
@@ -34,7 +34,7 @@ runtime libraries such as MPI may spawn threads to implement asynchronous progre
 Finally, in addition to multiple forms of threads, there may be multiple
 processes executing the application code on the node, the most obvious example
 of which is when MPI is used.  However, for purposes of this paper, we will
-not consider multiprocessing differently from multithreading,
+not consider multiprocessing differently from multi-threading,
 due to their similarities as it pertains to interoperability problems.
 
 In cases where OpenMP is coexisting with at least one other threading model,
@@ -53,12 +53,15 @@ the challenges of interoperating multiple threading models.
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.5\textwidth]{images/interop-motifs}
-\caption{Pictoral description of Phased, Concurrent and Nested
+\caption{Pictorial description of Phased, Concurrent and Nested
 motifs where two threading models must interoperate.
 \label{fig:interop-motif}
 }
 \end{figure}
 
+%With those identified classes and use cases, we studied the performance impacts of multiple parallel runtime that 
+%do not interoperate well with either incluing oversubscription and memory affinity confliction. We then propose language 
+%extensions to OpenMP to address the interoperability challengs of parallel programming. 
 \begin{comment}
 
 Applications are using multiple threading models.
@@ -129,16 +132,16 @@ wait policy between join and fork.
 
 \begin{comment}
 Large-scale parallel applications are typically developed using multiple parallel programming models in 
-a hybrid fashion, e.g. MPI+OpenMP, and using one or mulitple prebuilt scientific and/or platform-specific libraries such as Intel Math Kernel Library (MKL)~\cite{wang2014intel}.
+a hybrid fashion, e.g. MPI+OpenMP, and using one or multiple pre-built scientific and/or platform-specific libraries such as Intel Math Kernel Library (MKL)~\cite{wang2014intel}.
 Each of these programming models and libraries often has its own runtime library to handle scheduling of work units and management of computational
 and data movement tasks. 
 There have been challenging issues for using these models in one application, including 
 compatibility issues for compiling and linking, oversubscription of resources at runtime, and the naming conflicts that 
 programmers have to create workaround wrappers to deal with.
 
-This paper proposes solutions to the interoperability and composability challenges faced by the OpenMP programming interface, includling those
+This paper proposes solutions to the interoperability and composability challenges faced by the OpenMP programming interface, including those
 between multiple OpenMP implementations and/or multiple OpenMP runtime instances of the same implementation, OpenMP 
-with native threads (Pthreads and Windows Native threads), OpenMP with other threading languages and libraries such 
+with native threads (PThreads and Windows Native threads), OpenMP with other threading languages and libraries such 
 as C++11, TBB and Cilkplus, and OpenMP with inter-node programming models such as MPI and PGAS. We 
 think the similar challenges exist in other threading based libraries and language implementations, and believe
 the solutions we provided  will work for them too.  
@@ -147,7 +150,7 @@ Interoperability and composability are closely related, while the interoperabili
 while composability is meant to improve the modular use of OpenMP with itself and other models. One is from the aspect of system while 
 the other is more concerned with software engineering. Both should be considered when developing solutions. 
 
-For parallel programming languages and libraries, most implementations rely on system native threading (Pthreads or Windows Native threads) 
+For parallel programming languages and libraries, most implementations rely on system native threading (PThreads or Windows Native threads) 
 mechanisms to acquires system resources. Each implementation of the same or different programming models has their own mechanism for scheduling
 user-level tasks and operations, which is the core part of a runtime system. 
 The interoperability challenges are then concerned with how much we want two or more 

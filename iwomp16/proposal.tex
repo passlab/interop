@@ -11,12 +11,12 @@ internal hot teams in which threads are busy-waiting for work even if the progra
 So an OpenMP program could 
 consumes cycles of multiple CPU cores even if it is in sequential execution stage.
 
-This interoperability proposal attemps to address the oversubscription challenges by providing more information or control
+This interoperability proposal attempts to address the oversubscription challenges by providing more information or control
 to users for the threads in the runtime. The proposal also provides mechanism for an OpenMP runtime to interact with externals, including 
 contributing OpenMP threads for another parallel runtime, for processing tasks such as message passing that are not computational, or for receiving
 help from user threads to do OpenMP work. We also observed that a highly-interoperable OpenMP proposal is 
 complex for both the usage and implementation of those features. It introduces
-overheads that may not be necessnary for a program that does not need to interoperate in that degree of interoperability. 
+overheads that may not be necessary for a program that does not need to interoperate in that degree of interoperability. 
 Thus we
 categorize interoperability functionalities into the following multiple levels: 
 \begin{itemize}
@@ -91,7 +91,7 @@ int omp_get_num_threads_runtime(omp_thread_state_t state);
 \end{lstlisting}
 
 By using the API, a program would be able to claims or allocate appropriate amount of resources based on how many are occupied by the OpenMP
-runtime to avoid active oversubscriptions. 
+runtime to avoid active oversubscription. 
 
 \subsection{Level 2, OMP\_INTEROP\_SELF} 
 In this level, APIs are defined for adjusting the runtime behavior of the runtime, including the wait policy, dynamic feature, etc.
@@ -152,7 +152,7 @@ models, but also being tracked by the OpenMP runtime, but not belong to any thre
 The {\sf omp\_task\_create} procedure allows users to inject non-blocking tasks into the OpenMP runtime. A non-blocking task does not occupy
 a thread during the execution, it only requires the runtime to launch the task and to periodically query the task internally. The non-blocking
 tasks will be part of a {\sf taskgroup}, or joining a {\sf taskwait} or {\sf barrier} synchronization. It can be used with task dependencies by 
-passing the tags for in and out dependency. A typicall use case for this API is to request OpenMP runtime to launch a non-blocking MPI call by providing the call information and a function pointer for query the completion of this task. Again, runtime only launches the tasks and then periodically
+passing the tags for in and out dependency. A typical use case for this API is to request OpenMP runtime to launch a non-blocking MPI call by providing the call information and a function pointer for query the completion of this task. Again, runtime only launches the tasks and then periodically
 query its status using the provided {\sf task\_test\_func} function pointer parameter of {\sf omp\_thread\_create}.
 
 \subsection{Level 4, OMP\_INTEROP\_REAP} 
@@ -172,7 +172,7 @@ int omp_thread_attach(omp_runtime_handle_t runtime,
 The {\sf omp\_thread\_attach} procedure accepts a parameter for specifying a new stack for the thread when it joins the runtime. It also 
 allows for specifying a target place the thread should bind to. 
 The {\sf term\_flag} 
-is used for signalling the runtime that the attached thread should terminate when the variable becomes true. 
+is used for signaling the runtime that the attached thread should terminate when the variable becomes true. 
 The runtime evaluates the {\sf term\_flag} when the thread is not performing OpenMP work. 
 
 
@@ -187,7 +187,7 @@ However, the main goal of this work is to achieve a high level of resource utili
 	set the waiting thread behavior. The function returns the current wait{\_}policy, which could be different from intention of the call depending on the decision made by the runtime. If the value is PASSIVE, waiting threads should not consume CPU power while waiting; while the value is ACTIVE specifies that they should.
 	\item int omp{\_}thread{\_}create( ): 
 	to give the user the ability to create an OpenMP thread without using \#pragma omp parallel directive, and lets it be a user thread similar to pthread.
-	\item int ompe{\_}quiesce( ): 
+	\item int omp{\_}quiesce( ): 
 	to shutdown or unload the OpenMP runtime library.
 \end{enumerate}
 }

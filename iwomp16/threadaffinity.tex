@@ -1,7 +1,7 @@
 Besides the number of threads being used by an OpenMP program, thread affinity is another piece of critical 
 information about how resources are utilized. 
 Conflicting thread affinity happens when an OpenMP program binds threads to certain places (sockets, cores, or hardware threads)
-while another multithreaded program's affinity request overlaps the places.
+while another multi-threaded program's affinity request overlaps the places.
 The affinity conflicts can happen even the total number of threads requested does not exceed the number of hardware threads available.
 Obviously, conflicting thread affinity may adversely impact the performance of programs involved. 
 
