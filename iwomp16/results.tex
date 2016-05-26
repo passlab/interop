@@ -4,8 +4,6 @@ LLVM compiler version 3.8.0 for evaluating iOMP implementation. Test programs we
 \subsubsection{{\sf omp\_quiesce}}
 Figure~\ref{omp:quiesce_evaluation} shows the design of the evaluation. The test intended to measure the overhead of starting 
 up an OpenMP runtime and shuting down a runtime by using {\sf omp\_quiesce}, as compared to creating a parallel region. 
-Figure~\ref{omp:quiesce_results} shows that results. 
-%of the running time of all variables (startup{\_}quisece, parallel, and quiesce) increase as we increase the number of threads used. 
 The cost of creating a parallel region is very light because of the use of internal hot teams maintained by the runtime. The cost of shutdowning a runtime is about half of the cost of starting a runtime, but about 4 to 10 times of the cost of parallel region creation. 
 
 
@@ -15,7 +13,8 @@ The cost of creating a parallel region is very light because of the use of inter
 % FUSED FIGURE
 \begin{figure}[ht]
     \includegraphics[width=1.0\textwidth] {images/omp_quiesce_fusion}
-    \caption{{\sf omp\_quiesce} evaluation.\label{omp:quiesce_evaluation} }
+    \caption{{\sf omp\_quiesce} evaluation.}
+    \label{omp:quiesce_evaluation}
 \end{figure}
 
 % ORIGINAL FIGURE
