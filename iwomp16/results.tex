@@ -1,12 +1,12 @@
-The evaluation was performed on a machine with 2 Intel(R) Xeon(R) CPU E5-2699 for total 36 cores supporting total 72 threads. We use the latest
+The evaluation was performed on a machine using two Intel(R) Xeon(R) E5-2699 processors with total 36 cores supporting 72 threads. We use the latest
 LLVM compiler version 3.8.0 for evaluating iOMP implementation. Test programs were designed to evaluate the overhead of these functions. 
 
 \subsubsection{{\sf omp\_quiesce}}
-Figure~\ref{omp:quiesce_evaluation} shows the design of the evaluation. The test intended to measure the overhead of starting 
+Figure~\ref{omp:quiesce_evaluation} shows the design of the evaluation. 
+The test measures the overhead of starting 
 up an OpenMP runtime and shuting down a runtime by using {\sf omp\_quiesce}, as compared to creating a parallel region. 
-The cost of creating a parallel region is very light because of the use of internal hot teams maintained by the runtime. The cost of shutdowning a runtime is about half of the cost of starting a runtime, but about 4 to 10 times of the cost of parallel region creation. 
-
-
+The cost of creating a parallel region is very light because of the use of internal hot teams maintained by the runtime. 
+The cost of shutdowning a runtime is about half of the cost of starting a runtime, but about 4 to 10 times of the cost of parallel region creation. 
 
 %because the OpemMP just creates that once. Then, it puts them in a global thread pool to be used next time needed. However, the time cost represented by the quiesce term refers to the time required to shutdown the whole runtime library. In other words, after each parallel region we remove all threads in the global thread pool. Finally, the startup{\_}quiesce term implies the time required to initialize the parallel region and the time taken to shutdown the runtime library. 
 
