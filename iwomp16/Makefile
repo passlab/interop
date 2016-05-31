@@ -4,7 +4,7 @@
 # Copyright (C) 2006-2007, University of Chicago. All rights reserved.
 #
 
-HEADER = omp
+HEADER = OMPInterop
 PICS = images
 BIB = .
 TEX = .
