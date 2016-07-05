@@ -1,11 +1,65 @@
-The ongoing implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. The implementations for 
-the constructs for Level 0 and 1 are straightforward since they all for exposing the internal status of the runtime. In this section, 
+The implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. 
 we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 {\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
-For iOMP, the implementation of {\sf omp\_set\_wait\_policy} and {\sf omp\_quiesce} leverages the support for {\sf ACTIVE} and {\sf PASSIVE}
-environment setting for {\sf OMP\_WAIT\_POLICY} and the corresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
-use of {\sf KMP\_BLOCKTIME} and {\sf kmp\_set\_blocktime} for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
-and the {\sf \_\_kmp\_internal\_end\_fini} internal API for shutting down the runtime system. 
+
+For iOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
+implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
+wait policy of a thread to the {\sf SLEEP} policy is implemented by setting thread-specific variables. For
+supporting changing policies to either {\sf SPIN} or {\sf YIELD}, the implementation needs to include codes for 
+waking up those threads who are sleeping by using the provided thread suspension and resumption mechanisms.  
+The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex and 
+we validate the effectiveness of our implementation by checking the kernel state of the program state when being 
+executed.
+
+The thread behaves in the waiting state according to the policies specified by call to the {\sf omp\_set\_wait\_policy} or the default value from the wait-policy-var ICV. Below is the algorithm for the waiting loop.
+\begin{algorithm}[ht]
+	\small
+    \caption{The waiting loop of threads that are not computing}
+
+ \While{fork\_barrier\_not\_released}{
+   thread\_state = omp\_thread\_state\_SPIN\;
+   \If{unfinished tasks} {
+	   execute\_task ( ... )\;
+   }
+
+   \If{program finished} {
+	   break\;
+   }
+
+   \If{wait\_policy ==  omp\_thread\_state\_SPIN} {
+	   continue\;
+   }
+
+   \If{wait\_policy ==  omp\_thread\_state\_YIELD} {
+   	   thread\_state = omp\_thread\_state\_YIELD\;
+	   spins = thread\_yield\_spin\_time\;
+	   \While{program not finished and spins is greater than 0} {
+		sched\_yield()\;
+		spins -= 2\;
+	   }
+	   continue\;
+   }
+   thread\_state = omp\_thread\_state\_SLEEP\;
+   thread\_suspend()\;
+
+   
+   \If{program finished} {
+	   break\;
+   }
+   }
+ \label{algo:worker_sched}
+\end{algorithm} 
+
+
+The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
+should change the behavior of all the threads when it is called with SLEEP argument. 
+%{\sf ACTIVE} and {\sf PASSIVE}
+%environment setting for {\sf OMP\_WAIT\_POLICY} and the corresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
+%use of {\sf KMP\_BLOCKTIME} and {\sf kmp\_set\_blocktime} for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
+The implementation of {\sf omp\_quiesce(omp\_thread\_state\_KILL)} is a wrapper of 
+the {\sf \_\_kmp\_internal\_end\_fini} internal API which shuts down the runtime system~\cite{iccmanual}. 
+
+
 The implementation of  {\sf omp\_thread\_create/exit/join} needs to work around the need of a team when creating a thread, and the requirement 
 of a fork barrier and join barrier when assigning any work to a thread in the runtime. An internal team object is created when creating a thread 
 using the {\sf omp\_thread\_create} function. The implementation will first check the thread pool to find a waiting thread. If there is no thread
