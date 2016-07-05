@@ -2,14 +2,24 @@ OpenMP has become a successful programming model
 for developing multi-threaded applications.
 However, there are still some challenges in terms of OpenMP's interoperability
 with itself and other parallel programming models.
-In this paper, we explore typical use cases to expose OpenMP's interoperability challenges and
-propose a number of solutions.
+In this paper, we explore typical use cases that expose OpenMP's interoperability challenges and
+report our propose solutions for addressing the resource oversubscription issue as the efforts
+by the OpenMP Interoperability language subcommittee. 
 %which address one of more aspects of OpenMP's interoperability problem.
-The solutions we propose include several levels of interoperability functionalities of an OpenMP runtime and
-the corresponding OpenMP constructs supporting each level.
-Ongoing implementation is being done by extending two OpenMP runtime libraries.
-Initial results are given for one of the proposed interoperability functionalities 
+The solutions include OpenMP runtime routines for
+changing at the runtime the waiting policies, which include ACTIVE(SPIN), YIELD and PASSIVE(SLEEP), 
+of idling threads for improved resource management, and 
+routines for supporting contributing OpenMP threads to other thread library or tasks. 
+Our initial implementations are being done by extending two OpenMP runtime libraries, 
+Intel OpenMP (iOMP) and GNU OpenMP (gOMP).
+The evaluation results demonstrate the effectiveness of the proposed approach to address the resource 
+oversubscription challenges and detailed analysis provide heuristics for selecting wait policy according
+to the oversubscription ratios. 
+
+
+%This effort is part of OpenMP Interoperabity language s
+%Initial results are given for one of the proposed interoperability functionalities 
 %, including OpenMP's wait policy,
 %a new runtime feature 
-for quiescing the OpenMP thread pool to address oversubscription issue. 
+%for quiescing the OpenMP thread pool to address oversubscription issue. 
 %and an OpenMP-based abstraction for general-purpose OS threads.
