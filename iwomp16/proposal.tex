@@ -62,7 +62,7 @@ typedef enum omp_thread_state {
   omp_thread_state_SLEEP = 3,   /* sleeping */
   omp_thread_state_KILL = 4,    /* being killed */
 
-  OMP_ACTIVE_WAIT = omp_thread_state_SPIN;
+  OMP_ACTIVE_WAIT = omp_thread_state_SPIN,
   OMP_PASSIVE_WAIT = omp_thread_state_SLEEP;
 } omp_thread_state_t; 
 
