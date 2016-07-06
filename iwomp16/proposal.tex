@@ -41,6 +41,11 @@ thread could be in one of the following states while not participating in OpenMP
 	\item {\bf YIELD-SPIN}: The thread alternates the YIELD and SPIN cycles such that the thread can 
 		periodically query whether it is being called to join a team. The YIELD-SPIN state is actually the 
 		state the OpenMP runtime uses to manage the resources. 
+	\item {\bf TRIGGER}: The thread is putting to SLEEP state such that it is completely suspended. A sleeping
+		thread resumes upon some hardware state change.\footnote{
+                    On Intel platforms, this can be implemented using {\em monitor-mwait}.
+                    Blue Gene/Q supported a ``wake-up unit'' for fast thread resumption.
+                    Other processors may have similar features.}
 	\item {\bf SLEEP}: The thread is putting to SLEEP state such that it is completely suspended. A sleeping
 		thread can only be resumed by other threads or being timed out. 
 \end{itemize}
