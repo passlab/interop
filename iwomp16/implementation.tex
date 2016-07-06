@@ -13,6 +13,7 @@ executed.
 
 \begin{table}[htbp]
 	\centering
+\resizebox{12.5cm}{!}{
 \begin{tabular}{|l|l|l|l|} \hline
 \multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
 \multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
@@ -20,6 +21,7 @@ executed.
 \multirow{2}{*}{PASSIVE}& SPIN\_YIELD & User-level busy wait &  while (!finished()) yield() ;  \\ \cline{2-4}
                       & SLEEP       & Thread sleeps. Others wake it up. & thread\_wait(); thread\_wake();\\ \hline
 \end{tabular}
+}  
 \label{table:implement_wait}
 \caption{Implementation of wait policies }
 \end{table}
