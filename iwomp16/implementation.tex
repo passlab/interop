@@ -11,6 +11,31 @@ The thread suspension and resumption functionalities are implemented using pthre
 we validate the effectiveness of our implementation by checking the kernel state of the program state when being 
 executed.
 
+\begin{table}[htbp]
+	\centering
+\begin{tabular}{|l|l|l|l|} \hline
+\multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
+\multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
+                        & SPIN\_PAUSE & Busy wait with pausing CPU & while (!finished()) cpu\_relax(); \\ \hline
+\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & User-level busy wait &  while (!finished()) yield() ;  \\ \cline{2-4}
+                      & SLEEP       & Thread sleeps. Others wake it up. & thread\_wait(); thread\_wake();\\ \hline
+\end{tabular}
+\label{table:implement_wait}
+\caption{Implementation of wait policies }
+\end{table}
+
+
+\begin{comment}
+\begin{tabular}{||c|c|c|c|c||} \hline  % l l r  --> three columns, 
+\multirow{4}{*}{\rotatebox{90}{Impact}} & H &        &    &  \\ \cline{2-5}
+       & M &        &    & \\ \cline{2-5}
+       & L &        &    & \\ \cline{2-5}
+       &  &    L    &  M   &  H \\ \hline
+       & \multicolumn{4}{|c||}{\textbf{Probability}} \\ \hline
+\end{tabular}
+
+
+
 The thread behaves in the waiting state according to the policies specified by call to the {\sf omp\_set\_wait\_policy} or the default value from the wait-policy-var ICV. Below is the algorithm for the waiting loop.
 \begin{algorithm}[ht]
 	\small
@@ -50,6 +75,7 @@ The thread behaves in the waiting state according to the policies specified by c
  \label{algo:worker_sched}
 \end{algorithm} 
 
+\end{comment}
 
 The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
 should change the behavior of all the threads when it is called with SLEEP argument. 
