@@ -1,10 +1,34 @@
 %\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
-In this section, we study the interoperability challenges, and motivate our proposal. 
-We identified three types of use cases of interoperating OpenMP with itself and other parallel programming models as part of OpenMP Interoperability
-Subcommittee. CPU oversubscription and affinity confliction are the two major performance challenges we identified
-when multiple parallel libraries do not interoperate well with each other. We then discuss the limitations of the current standard to support 
-interoperability. 
-\subsection{Three Types of Use Cases} % of OpenMP Interoperability}
+In this section, we describe the three use cases of interoperating OpenMP with other parallel system
+We then discuss the interoperability challenge, the limitations of the current standard to support 
+interoperability, and the motivation of this work. 
+%as part of OpenMP Interoperability Subcommittee. 
+%CPU oversubscription and affinity confliction are the two major performance challenges we identified when multiple parallel libraries do not interoperate well with each other. 
+\subsection{Three Use Cases} % of OpenMP Interoperability}
+
+In cases where OpenMP is coexisting with at least one other threading model,
+we can identify at least three classes of scenarios in which to consider
+interoperability: Phased, Concurrent and Nested.
+These are illustrated in Figure~\ref{fig:interop-motif}.
+Threaded applications that call threaded libraries from a sequential region
+are a good example of the Phased motif.
+The thread(s) inside of e.g. an MPI library used by an OpenMP application
+matches with the Concurrent motif.
+Nested can be either OpenMP threads calling application or library
+functions that use another threading model, or the other way around.
+Of course, in all cases, the coexistence may not be as regular as
+the picture describes, but these simple cases are sufficient to reveal
+the challenges of interoperating multiple threading models.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{images/interop-motifs}
+\caption{Pictorial description of Phased, Concurrent and Nested
+motifs where two threading models must interoperate.
+\label{fig:interop-motif}
+}
+\end{figure}
+
+
 \subsubsection{Interacting With User threads}
 \input{userthread}
 
@@ -29,15 +53,16 @@ interoperability.
 
 
 \subsection{Issues with No or Poor Interoperability}
-In first two types of use cases for intra-node interoperability, 
-the existence of multiple user threads and other runtime instances
+In the use cases for intra-node interoperability, 
+the coexistence of multiple user threads and other runtime instances
 adds additional level(s) in the overall ``threading''
 hierarchy of a program. % Those additional levels could be on top of OpenMP threading mechanism when 
-Most OpenMP implementations, however, ignore their existence % user threads or other parallel runtime instance 
-in the decision making for runtime scheduling and resource management. 
 These additional levels of threading increase the complexity of a program for 
-users when reasoning parallel and synchronization behaviors of a program. It also leads to the following two issues  
-for performance when mapping computation and data to CPUs and memory.  
+users and complicate the reasoning of parallel and synchronization behaviors of parallel tasks. 
+More critically, it introduces at least two performance issues
+since most OpenMP implementations ignore their existence % user threads or other parallel runtime instance 
+in the decision making for runtime scheduling and resource management. 
+. %when mapping computation and data to CPUs and memory.  
 
 \subsubsection{CPU Oversubscription}
 \input{oversubscription}
@@ -46,14 +71,14 @@ for performance when mapping computation and data to CPUs and memory.
 \input{threadaffinity}
 
 \subsection{Limitation of Interoperability Support in the Standard}
-OpenMP currently (4.5) provides limited support for users to give hints to runtime for 
+The current OpenMP standard (4.5) provides limited support for users to give hints to runtime for 
 better managing OpenMP threads and native threads, which can be used to help reducing 
 the impact of oversubscription.
-First, the use of {\sf OMP\_DYNAMIC} group of constructs, which includes the environment variable, 
+First, the {\sf OMP\_DYNAMIC} group of constructs, which includes the environment variable, 
 the {\sf dyn-var} ICV, {\sf omp\_set\_dynamic} and {\sf omp\_get\_dynamic} runtime routine,
-expects the OpenMP implementation to be capable of adjusting the number of threads to use for executing parallel
-regions in order to optimize the use of system resources. This approach address in certain implementation the active
-oversubscription issue. 
+indicates the OpenMP implementation to adjust the number of threads to use for executing parallel
+regions in order to optimize the use of system resources. 
+This approach address only the active oversubscription issue. 
 %. OMP\_DYNAMIC could be either
 %{\bf true} or {\bf false}. When setting the dynvar ICV to be {\bf true}, user will 
 
@@ -66,20 +91,34 @@ preventing the dynamic adjustment of thread waiting behavior during the executio
 
 Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment, {\sf thread-limit-var} ICV and the {\sf omp\_get\_thread\_limit} getter give users an option to  
  set the maximum number of OpenMP threads to use in a contention group when the program starts, addressing oversubscription issues in certain
- degree. It however also does not provide setter to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
- its actually effects in real applications. 
+ degree. It however does not provide setter to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
+ its actually usage in real applications. 
 % by setting the threadlimitvar ICV.
 %The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support
 
 %\subsubsection{Global Impact of Environment Variables}
 \input{environmentvariable}
 
-Thus the current standard provide minimum support for interoperability, and an comprehensive solution is required to 
-provide an extensible set of interfaces for this feature. 
-It is important to note that approaches to address those issues are very implementation
-dependent, requiring protocol and agreement in the runtime behavior and/or interfaces 
-of different OpenMP implementations. It may not be realistic to solve some of the issue
-from the language standard, and should be left to users to deal with them. 
+
+As the combinations of different parallel programming APIs in one application
+at different system levels are becoming more
+practical solution than seeking a unified and comprehensive model, it become urgent for OpenMP to enhance the 
+interoperability support and to address the two important performance issues with better solutions 
+than what the current standard offers. The proposal in this paper provides 
+solutions to the CPU oversubscription issue and a comprehensive solution is the ongoing effort for 
+providing an extensible set of interfaces for addressing other interoperability issues. 
+
+
+
+%It is important to note that approaches to address those issues are very implementation
+%dependent, requiring protocol and agreement in the runtime behavior and/or interfaces 
+%of different OpenMP implementations. It may not be realistic to solve some of the issue
+%from the language standard, and should be left to users to deal with them. 
+
+%Thus the current standard provide minimum support for interoperability, and it is becoming urgent
+%to provide more support for this challenge since
+%in the short to medium term. A
+
 
 
 

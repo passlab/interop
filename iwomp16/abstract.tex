@@ -1,7 +1,7 @@
 OpenMP has become a successful programming model
 for developing multi-threaded applications.
 However, there are still some challenges in terms of OpenMP's interoperability
-with itself and other parallel programming models.
+with itself and other parallel programming languages and libraries.
 In this paper, we explore typical use cases that expose OpenMP's interoperability challenges and
 report our propose solutions for addressing the resource oversubscription issue as the efforts
 by the OpenMP Interoperability language subcommittee. 
@@ -10,7 +10,7 @@ The solutions include OpenMP runtime routines for
 changing at the runtime the waiting policies, which include ACTIVE(SPIN\_BUSY or SPIN\_PAUSE), 
 PASSIVE(SPIN\_YIELD or SLEEP), 
 of idling threads for improved resource management, and 
-routines for supporting contributing OpenMP threads to other thread library or tasks. 
+routines for supporting contributing OpenMP threads to other thread libraries or tasks. 
 Our initial implementations are being done by extending two OpenMP runtime libraries, 
 Intel OpenMP (iOMP) and GNU OpenMP (gOMP).
 The evaluation results demonstrate the effectiveness of the proposed approach to address the resource 

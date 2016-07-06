@@ -1,3 +1,17 @@
+
+Most implementations of the parallel programming APIs rely on system 
+native threading (PThreads or Windows Native threads) mechanisms to acquires system resources. 
+Each implementation of the same or different APIs has its own mechanism and algorithms for managing
+CPU resources. 
+The interoperability challenges are then concerned with how 
+two more more runtime instances % (for the same or different high-level programming interfaces) 
+should interact for coordinated resource sharing. 
+
+%
+%and data movement. Thus solutions to these challenges are more in the scope of runtime implementation, than in the level of programming
+%interfaces and compiler transformations. 
+
+
 OpenMP has been evolved to be a unified programming model for 
 parallel and heterogeneous computing nodes by including fork-join execution model, 
 data parallelism (worksharing), task parallelism, offloading execution model, etc.. 

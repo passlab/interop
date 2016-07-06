@@ -1,8 +1,11 @@
-The interoperability and composability of OpenMP programs are also limited by the global impact of OpenMP environment variables.
-Currently, the OpenMP specification has an implicit assumption that a single OpenMP program is running on a computation node at any given time.
-So the provided global environment variables should work properly to set the internal control variables that affect the execution
-of the single OpenMP program. 
-However, this causes problem when multiple OpenMP programs are running simultaneously on a computation node. 
-Environment variables affecting resource allocation may uniformly impact all OpenMP programs, which is often not desired.
+The interoperability within an OpenMP program are also limited by the global scope of 
+OpenMP environment variables. For example, we are not able to set different wait policies for 
+multiple concurrent {\sf parallel} region in nested parallel cases. 
+%Currently, the OpenMP specification has an implicit assumption that a 
+%single OpenMP program is running on a computation node at any given time.
+%So the provided global environment variables should work properly to set the internal control variables that affect the execution
+%of the single OpenMP program. 
+%However, this causes problem when multiple OpenMP programs are running simultaneously on a computation node. 
+%Environment variables affecting resource allocation may uniformly impact all OpenMP programs, which is often not desired.
 %For example, unless runtime library routines are explicitly used to customize each program's choices, \lstinline{OMP_NUM_THREADS}, \lstinline{OMP_PROC_BIND}, \lstinline{OMP_DEFAULT_DEVICE} may 
 %make all OpenMP runtime instances use the same number of threads, the same affinity, and the same accelerator device, respectively. 
