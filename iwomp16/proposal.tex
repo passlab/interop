@@ -3,19 +3,10 @@ Most implementations of the parallel programming APIs rely on system
 native threading (PThreads or Windows Native threads) mechanisms to acquires system resources. 
 Each implementation of the same or different APIs has its own mechanism and algorithms for managing
 CPU resources. 
-The oversubscription challenge is then concerned with how 
-two or more runtime instances % (for the same or different high-level programming interfaces) 
-should interact for coordinated resource sharing. 
-
-%
-%and data movement. Thus solutions to these challenges are more in the scope of runtime implementation, than in the level of programming
-%interfaces and compiler transformations. 
-
-
-OpenMP has been evolved to be a unified programming model for 
-parallel and heterogeneous computing nodes by including fork-join execution model, 
-data parallelism (worksharing), task parallelism, offloading execution model, etc.. 
-The runtime systems are becoming more complicated than before to support those language features.
+%OpenMP has been evolved to be a unified programming model for 
+%parallel and heterogeneous computing nodes by including fork-join execution model, 
+%data parallelism (worksharing), task parallelism, offloading execution model, etc.. 
+%The runtime systems are becoming more complicated than before to support those language features.
 A typical OpenMP runtime maintains 
 an internal thread pool to keep track of the native threads created by the runtime even they are not  
 doing any OpenMP operation during the sequential execution of the program. 
@@ -23,27 +14,14 @@ In the fork-join OpenMP execution model, a native thread in the thread pool
 is summoned to participate in an OpenMP team for computation upon the fork of the {\sf parallel} region. 
 The native thread returns back to the thread pool when a parallel 
 region is finished at the join barrier. While in the 
-thread pool, a native thread blocks in a fork barrier. The blocking mechaims could be  
-either busy-waiting which occupies a CPU core, or in the kernel
-scheduling queue after a yield system call (e.g. {\em sched\_yield} in Linux), or could be put to sleep. 
-Some OpenMP runtime also maintains
-internal hot teams in which threads are busy-waiting for work even if the program is in the sequential stage. 
-So an OpenMP program could consumes cycles of multiple CPU cores even if it is in sequential execution stage. In summary, an OpenMP runtime 
-thread could be in one of the following states while not participating in OpenMP computations.  
-\begin{itemize}
-	\item {\bf SPIN-WAIT}: The native thread spins waiting in the barrier call. 
-%		It is released from the barrier to participate in a team for computation by the runtime. 
-		SPIN waiting consumes CPU cycles.
-	\item {\bf YIELD}: The native thread relinquishs the CPU by kernel system call (e.g. {\em sched\_yield}) 
-		and is moved to the end of the kernel scheduling queue for its static priority. A thread in this 
-		stage can only be released to the OpenMP runtime by the kernel. 
-		% This is a kernel state while the runtime consider this as block system call. 
-	\item {\bf YIELD-SPIN}: The thread alternates the YIELD and SPIN cycles such that the thread can 
-		periodically query whether it is being called to join a team. The YIELD-SPIN state is actually the 
-		state the OpenMP runtime uses to manage the resources. 
-	\item {\bf SLEEP}: The thread is putting to SLEEP state such that it is completely suspended. A sleeping
-		thread can only be resumed by other threads or being timed out. 
-\end{itemize}
+thread pool, a native thread blocks in a fork barrier. 
+OpenMP runtime may also
+%Instead of moving the blocking thread to the thread pool, 
+maintains internal hot teams that keep threads actively waiting for the upcoming parallel regions. 
+%in which threads are busy-waiting for work even if the program is in the sequential stage. 
+So an OpenMP program could consumes cycles of multiple CPU cores even if it is in sequential execution stage.
+
+
 It is also often that an OpenMP program explicitly create native threads, e.g. PThreads, and each native thread has
 its own OpenMP {\sf parallel} region. 
 In such hybrid user-level native thread/OpenMP program, e.g. 
@@ -54,6 +32,68 @@ In the most recent OpenMP standard, a root thread forms a contention group and w
 consider all the decedant threads are members of the contention group. 
 
 
+The oversubscription challenge is then concerned with how 
+to coordinate the CPU resource sharing between two or more contention groups, and between multiple 
+runtime instances, which could be of the same or different runtime libraries. 
+Our solutions for addressing it provide users APIs for 
+dynamically setting the waiting policy of the blocking thread to minimize 
+the consumption of CPU cycles when idling. 
+%so threadsthat do not do useful work consume minimum CPU cycles. 
+
+
+\subsection{Definition and Extensions of the ACTIVE and PASSIVE Wait Policies}
+Our proposal defines more specifically 
+the ACTIVE and PASSIVE policies and also extends each to include two policies. 
+When a thread is waiting in ACTIVE state, it should not initiate calls to
+relinquish the CPU, though technically the OS kernel or hardware may switch it out of the core it occupies. 
+When in PASSIVE state, a thread initiates yielding or suspension operation to give up the CPU core. 
+The extensions of each of the policies are summerized in Table~\ref{table:implement_wait} and detailed description
+follows the table. 
+\begin{table}[ht]
+	\centering
+\resizebox{12.5cm}{!}{
+\begin{tabular}{|l|l|l|l|} \hline
+\multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
+\multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
+                        & SPIN\_PAUSE & Busy wait with pausing CPU & while (!finished()) cpu\_pause(); \\ \hline
+\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & Busy wait with yield &  while (!finished()) sched\_yield() ;  \\ \cline{2-4}
+                      & SUSPEND       & Thread sleeps. Others wake it up. & mutex\_wait(); mutex\_wake();\\ \hline
+\end{tabular}
+}  
+\label{table:implement_wait}
+\caption{Implementation of wait policies }
+\end{table}
+
+%The blocking mechaims could be  
+%either busy-waiting which occupies a CPU core, or in the kernel
+%scheduling queue after a yield system call (e.g. {\em sched\_yield} in Linux), or could be put to sleep. 
+%thread could be in one of the following states while not participating in OpenMP computations.  
+	{\bf ACTIVE SPIN\_BUSY}: The blocking thread spins waiting in a loop purely in user space. 
+%		It is released from the barrier to participate in a team for computation by the runtime. 
+		It consumes CPU cycles, saturates the CPU pipeline and consume memory bandwidth while checking
+		the conditions for being released. This policy allows the fastest response time when a thread is
+		released from the barrier. 
+
+	{\bf ACTIVE SPIN\_PAUSE}: The blocking thread spins waiting using a loop and also pauses the CPU core in 
+	each loop iteration. The pause operation introduces a slight delay in the loop, reducing the amount 
+	of instructions fed into the pipeline as well as the energy consumption. This policy also allows 
+	for very fast response time but consuming much less amount of CPU cycles 
+	and memory bandwidth than the SPIN\_BUSY policy.
+
+	{\bf PASSIVE SPIN\_YIELD}:  The blocking thread spins waiting using a loop and 
+	relinquishs the CPU in each iteration by kernel system call (e.g. {\em sched\_yield}). CPU yielding causes
+	the thread to be moved to the end of the kernel scheduling queue for its static priority. A thread in this 
+		stage can only be released to the OpenMP runtime by the kernel. Kernel context switch is involved
+		in each loop iteration, thus having higher overhead than the two ACTIVE policies. 
+		This policy provides average response time, but allows kernel to schedule other tasks to the same
+		CPU core while the thread yields. 
+
+	{\bf PASSIVE SUSPEND}: The thread is suspended when waiting in the barrier call. A suspended thread can only
+	be resumed by other threads or being timed out, thus does not consume CPU cycles. 
+	Suspending or resuming a thread, also known as putting a thread to sleep or to wake up,  are costly. Thus this approach has the longest response time and 
+	and the kernel can completely occupy the CPU core for other tasks.
+
+\subsection{Proposed Runtime Routines} 
 This interoperability proposal is an effort from OpenMP interoperability language subcommittee for addressing
 the oversubscription challenges of OpenMP programs when being executed with other threading library. 
 Our approach provides runtime routines to explose certain functionalities of the runtime systems for users to 
