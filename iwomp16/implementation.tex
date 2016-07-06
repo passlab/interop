@@ -1,6 +1,7 @@
 The implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. 
 we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 {\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
+Table~\ref{table:implement_wait} shows different wait policies and implementation psedudo code snippets. 
 
 For iOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
 implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
@@ -18,8 +19,8 @@ executed.
 \multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
 \multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
                         & SPIN\_PAUSE & Busy wait with pausing CPU & while (!finished()) cpu\_relax(); \\ \hline
-\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & User-level busy wait &  while (!finished()) yield() ;  \\ \cline{2-4}
-                      & SLEEP       & Thread sleeps. Others wake it up. & thread\_wait(); thread\_wake();\\ \hline
+\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & User-level busy wait &  while (!finished()) sched\_yield() ;  \\ \cline{2-4}
+                      & SLEEP       & Thread sleeps. Others wake it up. & mutex\_wait(); mutex\_wake();\\ \hline
 \end{tabular}
 }  
 \label{table:implement_wait}
