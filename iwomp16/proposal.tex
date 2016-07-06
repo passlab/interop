@@ -21,7 +21,6 @@ maintains internal hot teams that keep threads actively waiting for the upcoming
 %in which threads are busy-waiting for work even if the program is in the sequential stage. 
 So an OpenMP program could consumes cycles of multiple CPU cores even if it is in sequential execution stage.
 
-
 It is also often that an OpenMP program explicitly create native threads, e.g. PThreads, and each native thread has
 its own OpenMP {\sf parallel} region. 
 In such hybrid user-level native thread/OpenMP program, e.g. 
@@ -89,9 +88,14 @@ follows the table.
 		CPU core while the thread yields. 
 
 	{\bf PASSIVE SUSPEND}: The thread is suspended when waiting in the barrier call. A suspended thread can only
-	be resumed by other threads or being timed out, thus does not consume CPU cycles. 
-	Suspending or resuming a thread, also known as putting a thread to sleep or to wake up,  are costly. Thus this approach has the longest response time and 
-	and the kernel can completely occupy the CPU core for other tasks.
+	be resumed by other threads, being timed out, or upon some hardware state change~\footnote{
+                    On Intel platforms, this can be implemented using {\em monitor-mwait}.
+                    Blue Gene/Q supported a ``wake-up unit'' for fast thread resumption.
+                     Other processors may have similar features.}. A suspended thread does not consume CPU cycles, 
+		     however the operations of suspending or resuming a thread, also known as putting 
+		     a thread to sleep or to wake up, are costly. 
+		     Thus this approach has the longest response time and 
+		     the kernel can completely occupy the CPU core for other tasks.
 
 \subsection{Proposed Runtime Routines} 
 This interoperability proposal is an effort from OpenMP interoperability language subcommittee for addressing
