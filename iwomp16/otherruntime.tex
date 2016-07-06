@@ -2,7 +2,7 @@ A common case of the Nested class is an application that uses multiple parallel 
 using OpenMP, TBB, Cilkplus, C++11, and other parallel libraries. 
 %In Figure~\ref{fig:cholesky}, 
 For example, a Cholesky Factorization shown in Figure~\ref{fig:cholesky} uses OpenMP 
-tasking and BLAS operations provided by Intel MKL library~\footnote{The program was provided by Xavier Teruel from BSC demonstrating the interoperability problem for the INTERWinE project.}, 
+tasking and BLAS operations provided by Intel MKL library\footnote{The program was provided by Xavier Teruel from BSC demonstrating the interoperability problem for the INTERWinE project.}, 
 which is a parallel math library. The runtime will then need to coordinate the two
 parallel runtimes if the two do not integrate. %, e.g. each has its own instance during the program execution.
 It is also posibble that multiple OpenMP runtime instances from either same or different libraries coexist, which
