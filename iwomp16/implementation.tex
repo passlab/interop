@@ -1,6 +1,7 @@
 The implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. 
 we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 {\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
+Table~\ref{table:implement_wait} shows different wait policies and implementation psedudo code snippets. 
 
 For iOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
 implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
@@ -10,6 +11,24 @@ waking up those threads who are sleeping by using the provided thread suspension
 The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex and 
 we validate the effectiveness of our implementation by checking the kernel state of the program state when being 
 executed.
+
+\begin{table}[htbp]
+	\centering
+\resizebox{12.5cm}{!}{
+\begin{tabular}{|l|l|l|l|} \hline
+\multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
+\multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
+                        & SPIN\_PAUSE & Busy wait with pausing CPU & while (!finished()) cpu\_relax(); \\ \hline
+\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & User-level busy wait &  while (!finished()) sched\_yield() ;  \\ \cline{2-4}
+                      & SLEEP       & Thread sleeps. Others wake it up. & mutex\_wait(); mutex\_wake();\\ \hline
+\end{tabular}
+}  
+\label{table:implement_wait}
+\caption{Implementation of wait policies }
+\end{table}
+
+
+\begin{comment}
 
 The thread behaves in the waiting state according to the policies specified by call to the {\sf omp\_set\_wait\_policy} or the default value from the wait-policy-var ICV. Below is the algorithm for the waiting loop.
 \begin{algorithm}[ht]
@@ -50,6 +69,7 @@ The thread behaves in the waiting state according to the policies specified by c
  \label{algo:worker_sched}
 \end{algorithm} 
 
+\end{comment}
 
 The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
 should change the behavior of all the threads when it is called with SLEEP argument. 
@@ -66,8 +86,15 @@ using the {\sf omp\_thread\_create} function. The implementation will first chec
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
 The {\sf omp\_thread\_join} function is realized using a join counter. 
+The total amount changes to iOMP are about 200 lines of code, thus requiring small amount of efforts.  
 
-The total amount changes are about 200 lines of code, thus requiring small amount of efforts.  
+For GOMP, implementation is very similar. GOMP uses a spin count to control how long a thread waits actively
+before waiting passively. On Linux systems, busy wait is implemented by running a loop checking the waiting condition
+and calling cpu\_relax() if the condition is not met, as shown in the SPIN\_PAUSE policy in Table~\ref{table:implement_wait}.
+Passive waiting is implemented by calling mutex\_wait() and mutex\_wake(), as shown in the SLEEP policy in the table. 
+Our implementation of {\sf omp\_set\_wait\_policy} sets the spin count to be 0 if we want PASSIVE waiting, or
+a largest integer number possible if an active waiting is desired.
+The implementation of {\sf omp\_quiesce(omp\_thread\_state\_KILL)} is a wrapper of {\sf gomp\_free\_thread} which frees a thread pool and releases its threads. 
 
 \REM{
 In general, to implement those four functions, we follow the three steps:
