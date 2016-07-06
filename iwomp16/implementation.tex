@@ -29,15 +29,6 @@ executed.
 
 
 \begin{comment}
-\begin{tabular}{||c|c|c|c|c||} \hline  % l l r  --> three columns, 
-\multirow{4}{*}{\rotatebox{90}{Impact}} & H &        &    &  \\ \cline{2-5}
-       & M &        &    & \\ \cline{2-5}
-       & L &        &    & \\ \cline{2-5}
-       &  &    L    &  M   &  H \\ \hline
-       & \multicolumn{4}{|c||}{\textbf{Probability}} \\ \hline
-\end{tabular}
-
-
 
 The thread behaves in the waiting state according to the policies specified by call to the {\sf omp\_set\_wait\_policy} or the default value from the wait-policy-var ICV. Below is the algorithm for the waiting loop.
 \begin{algorithm}[ht]
@@ -95,8 +86,15 @@ using the {\sf omp\_thread\_create} function. The implementation will first chec
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
 The {\sf omp\_thread\_join} function is realized using a join counter. 
+The total amount changes to iOMP are about 200 lines of code, thus requiring small amount of efforts.  
 
-The total amount changes are about 200 lines of code, thus requiring small amount of efforts.  
+For GOMP, implementation is very similar. GOMP uses a spin count to control how long a thread waits actively
+before waiting passively. On Linux systems, busy wait is implemented by running a loop checking the waiting condition
+and calling cpu\_relax() if the condition is not met, as shown in the SPIN\_PAUSE policy in Table~\ref{table:implement_wait}.
+Passive waiting is implemented by calling mutex\_wait() and mutex\_wake(), as shown in the SLEEP policy in the table. 
+Our implementation of {\sf omp\_set\_wait\_policy} sets the spin count to be 0 if we want PASSIVE waiting, or
+a largest integer number possible if an active waiting is desired.
+The implementation of {\sf omp\_quiesce(omp\_thread\_state\_KILL)} is a wrapper of {\sf gomp\_free\_thread} which frees a thread pool and releases its threads. 
 
 \REM{
 In general, to implement those four functions, we follow the three steps:
