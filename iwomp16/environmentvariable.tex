@@ -1,6 +1,6 @@
-The interoperability within an OpenMP program are also limited by the global scope of 
-OpenMP environment variables. For example, we are not able to set different wait policies for 
-multiple concurrent {\sf parallel} region in nested parallel cases. 
+OpenMP's interoperability is also limited by the global scope of 
+its environment variables. For example, users cannot set different wait policies for 
+multiple concurrent {\sf parallel} regions in nested parallel cases. 
 %Currently, the OpenMP specification has an implicit assumption that a 
 %single OpenMP program is running on a computation node at any given time.
 %So the provided global environment variables should work properly to set the internal control variables that affect the execution
