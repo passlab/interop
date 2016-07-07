@@ -1,8 +1,8 @@
-The implementation is performed in the latest Intel OpenMP runtime (iOMP) and GNU Compiler Runtime (gOMP). % version 6.1.0. 
+The implementation is performed in the latest Intel OpenMP runtime (IOMP) and GNU Compiler Runtime (GOMP). % version 6.1.0. 
 %we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
 %{\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
 
-For iOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
+For IOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
 implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
 the {\sf OMP\_SUSPEND\_WAIT} policy is implemented by setting thread-specific variables. For
 supporting changing policies to one of the {\sf ACTIVE} policies or the {\sf OMP\_SPIN\_YIELD} policy, 
@@ -68,15 +68,15 @@ using the {\sf omp\_thread\_create} function. The implementation will first chec
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
 The {\sf omp\_thread\_join} function is realized using a join counter. 
-%The total amount changes to iOMP are about 200 lines of code, thus requiring small amount of efforts.  
+%The total amount changes to IOMP are about 200 lines of code, thus requiring small amount of efforts.  
 
-For gOMP, the implementation is very similar to iOMP.
-Both iOMP and gOMP use timeout mechanism (blocktime in iOMP and spincount in gOMP) 
+For GOMP, the implementation is very similar to IOMP.
+Both IOMP and GOMP use timeout mechanism (blocktime in IOMP and spincount in GOMP) 
 to control how long a thread waits actively before waiting passively. The implementations set the timeout value to either 0 or the max integer 
 for {\sf PASSIVE} waiting or {\sf ACTIVE} waiting, respectively. 
 For the wait policies, Table~\ref{table:implement_wait} shows implementation psedudo code snippets applicable to both of 
-the two runtime systems, though for gOMP, the cpu\_pause function is called cpu\_relax().  
-The gOMP implementation of {\sf omp\_quiesce(OMP\_TERMINATE)} is a wrapper of {\sf gomp\_free\_thread} 
+the two runtime systems, though for GOMP, the cpu\_pause function is called cpu\_relax().  
+The GOMP implementation of {\sf omp\_quiesce(OMP\_TERMINATE)} is a wrapper of {\sf gomp\_free\_thread} 
 which frees a thread pool and releases its threads. 
 
 
