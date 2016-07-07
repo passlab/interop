@@ -122,12 +122,12 @@ for a program that heaviliy oversubscribes hardware resources, the SLEEP policy 
 
 \subsection{Performance With Regards to the Oversubscription Ratio}
 To future study the effects of the three wait policies and the approach for selecting an optimal policy for different
-oversubscription configurations, we introduce the term oversubscription ratio as the the ratio of total number of
+oversubscription configurations, we introduce the term oversubscription ratio as the ratio of total number of
 threads requested by a program to the total number of hardware threads. If the ratio is less than or equal to 1,
 there is no oversubscription (assuming the program uses all the hardware threads of the system). 
 In figure~\ref{fig:ovratio}, we consolidate the results from the previous three figures and plot with regards to 
 the oversubscription ratio. The left figure shows that when the ratio is less than 1.0, YIELD delivers the
-best performance, wiht SPIN beling close. When the ratio is between 1.0 to 4.0, YIELD still performs consistently
+best performance, with SPIN being close. When the ratio is between 1.0 to 4.0, YIELD still performs consistently
 better than others but with SLEEP policy being the close one. Also when the ratio is above 1.0, SPIN performs very
 badly. When the ratio is between 4.0 and 7.0, the performance delivered by YIELD and SLEEP policies are close. 
 However, when the ratio is 8.0 or above, the SLEEP policy significantly outperforms the YIELD policy. 
