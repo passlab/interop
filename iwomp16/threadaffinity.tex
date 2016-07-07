@@ -1,10 +1,11 @@
-Besides oversubscribing computational resources (hardware cores) by an OpenMP program, 
-memory and thread affinity are another kinds of resources that should be coordinately allocated and managed among
+Besides oversubscribing CPU cores by an OpenMP program, 
+memory are another kind of resources that should be coordinately allocated and managed among
 multiple parallel runtimes. %about how resources are utilized. 
-Thread affinity conflict happens when an OpenMP runtime binds threads data to 
+When the OpenMP runtime binds threads data to 
 certain memory places (cache or NUMA region) that are already occupied by 
-the affinity requests of another runtime. Such overlaps cause excessive cache or memory spills or relocation of data
-to further places, resulting increased memory access latency because of false sharing or 
+the affinity requests of another runtime, thread affinity conflict happens.  
+Such memory overlaps cause excessive cache or memory spills or relocation of data
+to farther places, resulting increased memory access latency because of false sharing or 
 poor locality of thread and its data. %the places.
 The affinity conflicts can happen even the total number of threads requested does not exceed the number of hardware threads available.
 %Obviously, conflicting thread affinity may adversely impact the performance of programs involved. 

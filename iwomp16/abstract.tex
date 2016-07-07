@@ -7,13 +7,13 @@ report our proposed solutions for addressing the resource oversubscription issue
 by the OpenMP Interoperability language subcommittee. 
 %which address one of more aspects of OpenMP's interoperability problem.
 The solutions include OpenMP runtime routines for
-changing at the runtime the waiting policies, which include ACTIVE(SPIN\_BUSY or SPIN\_PAUSE), 
-PASSIVE(SPIN\_YIELD or SLEEP), 
+changing the waiting policies, which include ACTIVE(SPIN\_BUSY or SPIN\_PAUSE), 
+PASSIVE(SPIN\_YIELD or SUSPEND), 
 of idling threads for improved resource management, and 
 routines for supporting contributing OpenMP threads to other thread libraries or tasks. 
 Our initial implementations are being done by extending two OpenMP runtime libraries, 
 Intel OpenMP (iOMP) and GNU OpenMP (gOMP).
-The evaluation results demonstrate the effectiveness of the proposed approach to address the resource 
+The evaluation results demonstrate the effectiveness of the proposed approach to address the CPU 
 oversubscription challenge and detailed analysis provide heuristics for selecting an optimal wait policy according
 to the oversubscription ratios. 
 

@@ -2,7 +2,7 @@
 A typical example of the Phased class is the use of user threads in a program. A user thread 
 is the thread that is explicitly created by user, 
 for examples PThreads or Windows Native threads created 
-using POSIX or Win32 APIs, or Java or C++11 threads. 
+using POSIX or Win32 APIs, or C++11 threads. 
 %implementation. 
 %A user thread 
 %could become an OpenMP initial thread. 
@@ -10,8 +10,8 @@ using POSIX or Win32 APIs, or Java or C++11 threads.
 %There are also implementations of other thread libraries, 
 %for example, 
 %Windows Native threads and language based threading support such as Java threads, C++11 threads and futures, as well as others such as qthreads. 
-A user thread could become an OpenMP initial thread that creates OpenMP {\sf parallel} region, 
- or beneath the OpenMP threading runtime when an OpenMP thread spawns 
+A user thread could become an OpenMP initial thread that creates OpenMP {\sf parallel} regions, 
+or nested inside a {\sf parallel} region when an OpenMP thread spawns 
 a user thread, or the mix of both. 
 
 \REM{

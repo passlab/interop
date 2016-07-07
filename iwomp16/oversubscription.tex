@@ -2,7 +2,7 @@ Oversubscription happens when resources are claimed and held than what are neede
 A program may request more OpenMP threads than the total amount of hardware
 threads available when entering a {\sf parallel} region, which causes excessive competition 
 among OpenMP threads for hardware cores and increases runtime overhead. 
-When program execution enters into sequential stage after exiting a parallel region, 
+When program execution enters into sequential stage after exiting a {\sf parallel} region, 
 those native threads that support the OpenMP threads in the parallel region may still 
 alive in the background consuming CPU cycles. This 
 will make those hardware cores unavailable to others. 

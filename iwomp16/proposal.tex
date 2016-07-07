@@ -1,23 +1,23 @@
 
-Most implementations of the parallel programming APIs rely on system 
-native threading (PThreads or Windows Native threads) mechanisms to acquires system resources. 
-Each implementation of the same or different APIs has its own mechanism and algorithms for managing
-CPU resources. 
+%Most implementations of the parallel programming APIs rely on system 
+%native threading (PThreads or Windows Native threads) mechanisms to acquires system resources. 
+%Each implementation of the same or different APIs has its own mechanism and algorithms for managing
+%CPU resources. 
 %OpenMP has been evolved to be a unified programming model for 
 %parallel and heterogeneous computing nodes by including fork-join execution model, 
 %data parallelism (worksharing), task parallelism, offloading execution model, etc.. 
 %The runtime systems are becoming more complicated than before to support those language features.
 A typical OpenMP runtime maintains 
 an internal thread pool to keep track of the native threads created by the runtime even they are not  
-doing any OpenMP operation during the sequential execution of the program. 
-In the fork-join OpenMP execution model, a native thread in the thread pool 
-is summoned to participate in an OpenMP team for computation upon the fork of the {\sf parallel} region. 
-The native thread returns back to the thread pool when a parallel 
+doing any OpenMP operation, e.g. during the sequential execution of the program. 
+In the OpenMP's fork-join execution model, a native thread in the thread pool 
+is summoned to participate in an OpenMP team for computation upon the fork of a {\sf parallel} region. 
+The native thread returns back to the thread pool when the {\sf parallel} 
 region is finished at the join barrier. While in the 
 thread pool, a native thread blocks in a fork barrier. 
 OpenMP runtime may also
 %Instead of moving the blocking thread to the thread pool, 
-maintains internal hot teams that keep threads actively waiting for the upcoming parallel regions. 
+maintains internal hot teams that keep threads actively waiting for the upcoming {\sf parallel} regions. 
 %in which threads are busy-waiting for work even if the program is in the sequential stage. 
 So an OpenMP program could consumes cycles of multiple CPU cores even if it is in sequential execution stage.
 

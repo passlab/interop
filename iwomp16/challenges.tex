@@ -1,5 +1,5 @@
 %\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
-In this section, we describe three use cases of interoperating OpenMP with other parallel system
+In this section, we describe three use cases of interoperating OpenMP with other parallel systems
 and discuss the interoperability challenge of OpenMP.
 %We then discuss the interoperability challenge, the limitations of the current standard to support 
 %interoperability, and the motivation of this work. 
@@ -30,7 +30,7 @@ motifs where two threading models must interoperate.
 \end{figure}
 
 
-\subsubsection{Interacting With User threads}
+\subsubsection{Interacting With User Threads}
 \input{userthread}
 
 %\subsubsection{Interacting with Other OpenMP Programs}
@@ -58,7 +58,7 @@ In the use cases for intra-node interoperability,
 the coexistence of multiple user threads and other runtime instances
 adds additional level(s) in the overall ``threading''
 hierarchy of a program. % Those additional levels could be on top of OpenMP threading mechanism when 
-These additional levels of threading increase the complexity of a program for 
+These additional levels increase the complexity of a program for 
 users and complicate the reasoning of parallel and synchronization behaviors of parallel tasks. 
 More critically, it introduces at least two performance issues
 since most OpenMP implementations ignore their existence % user threads or other parallel runtime instance 
@@ -72,26 +72,26 @@ in the decision making for runtime scheduling and resource management.
 \input{threadaffinity}
 
 \subsection{Limitation of Interoperability Support in the Standard}
-The current OpenMP standard (4.5) provides limited support for users to give hints to runtime for 
-better managing OpenMP threads and native threads, which can be used to help reducing 
-the impact of oversubscription.
-First, the {\sf OMP\_DYNAMIC} group of constructs, which includes the environment variable, 
-the {\sf dyn-var} ICV, {\sf omp\_set\_dynamic} and {\sf omp\_get\_dynamic} runtime routine,
-indicates the OpenMP implementation to adjust the number of threads to use for executing parallel
+The current OpenMP standard (4.5) provides limited support for users to influence the runtime for 
+better managing hardware resources and OpenMP threads to minimize the performance impact of oversubscription.
+First, the {\sf OMP\_DYNAMIC} variable, % as well as the {\sf dyn-var} ICV, 
+and the {\sf omp\_set\_dynamic} %and {\sf omp\_get\_dynamic}
+ routine, indicate the OpenMP runtime to adjust the number of threads to use for executing parallel
 regions in order to optimize the use of system resources. 
-This approach address only the active oversubscription issue. 
+This approach address only the active oversubscription issue and it heavily depends on how the runtime supports this feature. 
 %. OMP\_DYNAMIC could be either
 %{\bf true} or {\bf false}. When setting the dynvar ICV to be {\bf true}, user will 
 
 %\paragraph{OMP\_WAIT\_POLICY} %environment variable}
-Second, the {\sf ACTIVE} setting for the {\sf OMP\_WAIT\_POLICY} and its associated {\sf wait-policy-var} ICV, 
-dictates the waiting thread in sequential region to be actively waiting, which consume processor cycles.
+Second, the {\sf ACTIVE} setting for the {\sf OMP\_WAIT\_POLICY} variable %and its associated {\sf wait-policy-var} ICV, 
+dictates the waiting thread in sequential region to be actively waiting, which may consume CPU cycles.
 The {\sf PASSIVE} setting allows those threads to yield CPUs for others to use, which addresses the passive 
-oversubscription issue. The standard however only allows one time setting of the variable when the program starts, thus 
+oversubscription issue. The standard however only allows one time setting when the program starts, thus 
 preventing the dynamic adjustment of thread waiting behavior during the execution. 
 
-Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment, {\sf thread-limit-var} ICV and the {\sf omp\_get\_thread\_limit} getter give users an option to  
- set the maximum number of OpenMP threads to use in a contention group when the program starts, addressing oversubscription issues in certain
+Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment %, {\sf thread-limit-var} ICV and the {\sf omp\_get\_thread\_limit} getter 
+give users an option to  
+ set the maximum number of OpenMP threads when the program starts, addressing oversubscription issues in certain
  degree. It however does not provide setter to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
  its actually usage in real applications. 
 % by setting the threadlimitvar ICV.
@@ -107,9 +107,10 @@ practical solution than creating a single unified and
 comprehensive model, it becomes urgent for OpenMP to enhance its 
 interoperability support.
 %and to address the two important performance issues with better solutions 
-%than what the current standard offers. The proposal in this paper provides 
-%solutions to the CPU oversubscription issue and a comprehensive solution is the ongoing effort 
-%that will provide an extensible set of interfaces for addressing other interoperability issues. 
+%than what the current standard offers. 
+The proposal in this paper provides 
+solutions to the CPU oversubscription issue and a comprehensive solution will provide 
+an extensible set of interfaces for addressing other interoperability issues. 
 
 
 
