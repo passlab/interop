@@ -1,8 +1,8 @@
-Previous studies to address interoperability and composability of parallel programming models and libraries 
+Previous studies address interoperability and composability of parallel programming models and libraries 
 from different aspect and for different programming models. 
 Tian et al.~\cite{tian2003compiler} explored interoperability between OpenMP threads and system threads in the Intel OpenMP compiler.
 For ease of use for programmers, they decided not to share thread identifiers between system threads and their OpenMP parent
-and not to share threadprivate variables among system threads.
+and not to share {\sf threadprivate} variables among system threads.
 %Also, a forked system thread calling \lstinline{omp_in_parallel()} would return false, even if it is created by an OpenMP thread. 
 Callisto~\cite{Callisto:Harris:2014:CCP:2592798.2592807} and
 Lithe~\cite{Lithe:Pan:2009:LEE:1855591.1855602} 
