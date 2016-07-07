@@ -1,11 +1,14 @@
-In this paper, we have explored use cases for OpenMP to interact other parallel programming models
-in order to study the interoperability challenges of parallel programming. 
-We have proposed a set of extensions to OpenMP to support multiple levels of interoperability functionalities. While our proposal is based 
-on OpenMP, the principles and solutions could be applied to other programming models. 
+In this paper, we have studied use cases of using OpenMP with other parallel programming models
+in order to expose its interoperability challenges.  
+In particular, we focused on the CPU oversubscription challenge and proposed a set of new runtime routines of OpenMP
+to change thread wait policies 
+and contribute OpenMP threads to other thread libraries. 
+%While our proposal is based 
+%on OpenMP, the principles and solutions could be applied to other programming models. 
 %seen that there are many features can be added to the current 
-Ongoing implementation is being done using two OpenMP runtime libraries, and we demonstrate with 
-some of the initial performance results and efforts for the implementation. % with initial results for 
-%interoperability functions for setting wait policies, shutting down runtime, and creating user threads, etc. 
+Initial implementation has been done using two OpenMP runtime libraries with demonstrated effectiveness
+to address resource oversubscription and detailed analysis for selecting optimal wait policies.
+
 \begin{comment}
 One feature is 
 that allowing the user to create a new OpenMP thread and assign a task to it instead 
@@ -19,5 +22,7 @@ We have studied the waiting policy of the OpenMP and how the current OpenMP Runt
 In addition, we have implemented a new function to shutdown the whole runtime library when exiting the parallel region. Since all threads are maintained in the same thread pool, quiesce will reap every threads to free the memory, which sometimes help to clear the runtime environment when the task density is lower and we don’t need to wake up most of the thread in the thread pool. However, when entering new parallel regions, we need to make sure that we register the current working thread as our root thread, so that new runtime environment can be built on it. It cost time to restart another parallel region, thus works slower when lots of tasks in the task queue.
 \end{comment}
 
-For future work, we will continue adding more proposed interoperability functionalities into the existing runtime systems. We will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of OpenMP runtime systems with better interoperability. 
+For future work, we will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of OpenMP runtime systems with our extensions.
+We will also investigate how to avoid conflicting thread affinity and explore challenges of using multiple instances of OpenMP runtimes.
+%adding more proposed interoperability functionalities into the existing runtime systems. We will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of OpenMP runtime systems with better interoperability. 
 %By doing this, we could have a better OpenMP runtime library that optimizes the resources utilization.

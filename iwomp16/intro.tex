@@ -44,7 +44,7 @@ One of the challenges for using multiple models in one application is the intero
 interaction of the threading runtime of the models, for example the issues of naming conflicts and resource
 oversubscription. 
 
-%. omposability are closely related, while the interoperability sounds to improve the interactions between multiple models
+%. Composability are closely related, while the interoperability sounds to improve the interactions between multiple models
 %while composability is meant to improve the modular use of OpenMP with itself and other models. One is from the aspect of system while 
 %the other is more concerned with software engineering. Both should be considered when developing solutions. 
 
@@ -52,7 +52,7 @@ This paper reports our proposal to OpenMP for combating the resource oversubscri
 the OpenMP Interoperability language subcommittee. The work makes three contributions: 1) a study 
 of OpenMP interoperability challenge which includes use cases, performance impacts and the limitation 
 of the current standard to address this challenge; 2) proposed extensions to OpenMP to improve the thread
-management to enhance OpenMP to interoperate with other threading model; 3) evaluation and performance
+management to enhance OpenMP to interoperate with other threading models; 3) evaluation and performance
 study that demonstrate the effectiveness of the proposed solution and provide guideline for selecting thread
 waiting policies according to the oversubscription ratios. 
 %Though proposed as OpenMP extensions, the solution 
@@ -60,13 +60,14 @@ waiting policies according to the oversubscription ratios.
 We think the similar challenge exists in other threading based libraries and language implementations, and believe
 the solutions we provided  will work for them too.  
 
+\begin{comment} % the paragraph above already introduces layout of the paper
 The rest of the paper is organized as follows: Section~\ref{sec:challenges} discusses the interoperability 
 use cases, challenges and motivations. 
  Section~\ref{sec:proposal} describes the proposed OpenMP runtime routines.
  Section~\ref{sec:implementation} presents our implementation and experimental results. 
  Finally, Section~\ref{sec:related} discusses related
 work and Section~\ref{sec:conclusion} contains our conclusions.
-
+\end{comment}
 
 
 
@@ -74,8 +75,8 @@ work and Section~\ref{sec:conclusion} contains our conclusions.
 
 
 %With those identified classes and use cases, we studied the performance impacts of multiple parallel runtime that 
-%do not interoperate well with either incluing oversubscription and memory affinity confliction. We then propose language 
-%extensions to OpenMP to address the interoperability challengs of parallel programming. 
+%do not interoperate well with either including oversubscription and memory affinity confliction. We then propose language 
+%extensions to OpenMP to address the interoperability challenges of parallel programming. 
 \begin{comment}
 
 Applications are using multiple threading models.

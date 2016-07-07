@@ -1,7 +1,8 @@
 %\TODO{Introduction mentions interoperability between two OpenMP runtimes. But this section does not mention this. That is part of use case #2}
-In this section, we describe the three use cases of interoperating OpenMP with other parallel system
-We then discuss the interoperability challenge, the limitations of the current standard to support 
-interoperability, and the motivation of this work. 
+In this section, we describe three use cases of interoperating OpenMP with other parallel system
+and discuss the interoperability challenge of OpenMP.
+%We then discuss the interoperability challenge, the limitations of the current standard to support 
+%interoperability, and the motivation of this work. 
 %as part of OpenMP Interoperability Subcommittee. 
 %CPU oversubscription and affinity confliction are the two major performance challenges we identified when multiple parallel libraries do not interoperate well with each other. 
 \subsection{Three Use Cases} % of OpenMP Interoperability}
@@ -103,11 +104,12 @@ Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment, {\sf thread-limit-var} ICV an
 As the combinations of different parallel programming APIs in one application
 at different system levels are becoming more
 practical solution than creating a single unified and 
-comprehensive model, it become urgent for OpenMP to enhance the 
-interoperability support and to address the two important performance issues with better solutions 
-than what the current standard offers. The proposal in this paper provides 
-solutions to the CPU oversubscription issue and a comprehensive solution is the ongoing effort 
-that will provide an extensible set of interfaces for addressing other interoperability issues. 
+comprehensive model, it becomes urgent for OpenMP to enhance its 
+interoperability support.
+%and to address the two important performance issues with better solutions 
+%than what the current standard offers. The proposal in this paper provides 
+%solutions to the CPU oversubscription issue and a comprehensive solution is the ongoing effort 
+%that will provide an extensible set of interfaces for addressing other interoperability issues. 
 
 
 
