@@ -6,19 +6,20 @@ We first developed microbenchmarks for evaluating parallel startup cost after ap
 quiescing the runtime system, as well as the cost for the {\sf omp\_set\_wait\_policy} and {\sf omp\_quiesce} 
 routines.  
 Figure~\ref{omp:overhead_table} shows the results of the evaluation. 
-First, when applying SPIN and YIELD wait policy, we did not much increase of overhead for creating 
-parallel regions. We however observed significant increase of overhead of creating parallel region when SLEEP
-wait policy is applied, which can be explained by the cost to suspend and resume the runtime threas when the 
-SLEEP wait policy is in effects. The use of {\sf omp\_quiesce} with KILL policy, which completely shutdown the 
+The use of each of the two {\sf ACTIVE} policies and the PASSIVE(SPIN\_YIELD) policy 
+introduce very minimum and neglectable overhead to the {\sf parallel} region startup. 
+When PASSITVE(SUSPEND) policy is applied, we observed significant increase of overhead of creating parallel region, 
+which can be explained by the cost to suspend and resume the runtime threas when the policy is in effect. 
+The use of {\sf omp\_quiesce} with TERMINATE policy, which completely shutdown the 
 runtime, dramatically increase the overhead, close to 1000x, of starting the a new parallel region. In this 
 scenario, the cost of initializing the whole runtime is counted toward {\sf parallel} startup overhead. Second, 
 for the overhead of the two routines, {\sf omp\_set\_wait\_policy} incurs very minimum overhead. The 
 {\sf omp\_quiesce} routine however incurs high overhead since it needs to terminate the runtime threads as well as 
 destroy all the resources allocated for the runtime (e.g. mutex, condition variables and memory, etc). 
 
-The overhead evaluations show that the ACTIVE(SPIN) and YIELD policies do not impact much of the {\sf parallel} 
-region start up. The PASSIVE(SLEEP) policies introduce overheads for creating new parallel regions that need to wake up sleeping thread, thus should use with care. The {\sf omp\_quiesce(KILL)} is a heavy operations and should only be
-used when there is no need to use the runtime in the program. 
+%The overhead evaluations show that the ACTIVE(SPIN) and YIELD policies do not impact much of the {\sf parallel} 
+%region start up. The PASSIVE(SLEEP) policies introduce overheads for creating new parallel regions that need to wake up sleeping thread, thus should use with care. The {\sf omp\_quiesce(KILL)} is a heavy operations and should only be
+%used when there is no need to use the runtime in the program. 
 
 %The test measures the overhead of starting 
 %up an OpenMP runtime and shutting down a runtime by using {\sf omp\_quiesce}, as compared to creating a parallel region. 
