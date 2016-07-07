@@ -40,9 +40,10 @@ the consumption of CPU cycles when idling.
 %so threadsthat do not do useful work consume minimum CPU cycles. 
 
 
-\subsection{Definition and Extensions of the ACTIVE and PASSIVE Wait Policies}
+\subsection{Definition of the ACTIVE and PASSIVE Wait Policies}
 Our proposal defines more specifically 
-the ACTIVE and PASSIVE policies and also extends each to include two policies. 
+the ACTIVE and PASSIVE policies and also extends each to include multiple policies that dictate more
+specifically the exact behavior of the waiting thread. 
 When a thread is waiting in ACTIVE state, it should not initiate calls to
 relinquish the CPU, though technically the OS kernel or hardware may switch it out of the core it occupies. 
 When in PASSIVE state, a thread initiates yielding or suspension operation to give up the CPU core. 
@@ -51,16 +52,21 @@ follows the table.
 \begin{table}[ht]
 	\centering
 \resizebox{12.5cm}{!}{
-\begin{tabular}{|l|l|l|l|} \hline
-\multicolumn{2}{|c|}{\textbf{Policy}} & \textbf{Description} & \textbf{Pseudo Code}\\ \hline
-\multirow{2}{*}{ACTIVE} & SPIN\_BUSY  & User-level busy wait & while (!finished()) ;  \\ \cline{2-4}
-                        & SPIN\_PAUSE & Busy wait with pausing CPU & while (!finished()) cpu\_pause(); \\ \hline
-\multirow{2}{*}{PASSIVE}& SPIN\_YIELD & Busy wait with yield &  while (!finished()) sched\_yield() ;  \\ \cline{2-4}
-                      & SUSPEND       & Thread sleeps. Others wake it up. & mutex\_wait(); mutex\_wake();\\ \hline
-\end{tabular}
-}  
+\begin{tabular}{|l|l|l|l|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Wait Policy}} & \textbf{Description} & \textbf{Pseudo code} \\
+\hline
+\multirow{2}[4]{*}{{ACTIVE}} & {SPIN\_BUSY} & Busy wait in user level & while (!finished()) ; \\
+\cline{2-4}      & {SPIN\_PAUSE} & Busy wait while pausing CPU & while (!finished()) cpu\_pause() \\
+\hline
+\multirow{3}[6]{*}{{PASSIVE}} & {SPIN\_YIELD} & Busy wait with yield & while (!finished()) sched\_yield(); \\
+\cline{2-4}      & {SUSPEND} & Thread sleeps. Others wake it up. & mutex wait(); mutex wake(); \\
+\cline{2-4}      & {TERMINATE} & Thread terminates &  \\
+\hline
+\end{tabular}%
+}
 \label{table:implement_wait}
-\caption{Implementation of wait policies }
+\caption{Wait Policies}
 \end{table}
 
 %The blocking mechaims could be  
@@ -69,8 +75,8 @@ follows the table.
 %thread could be in one of the following states while not participating in OpenMP computations.  
 	{\bf ACTIVE SPIN\_BUSY}: The blocking thread spins waiting in a loop purely in user space. 
 %		It is released from the barrier to participate in a team for computation by the runtime. 
-		It consumes CPU cycles, saturates the CPU pipeline and consume memory bandwidth while checking
-		the conditions for being released. This policy allows the fastest response time when a thread is
+		It consumes CPU cycles and memory bandwidth while loop checking
+		the condition for being released. This policy allows the fastest response time when a thread is
 		released from the barrier. 
 
 	{\bf ACTIVE SPIN\_PAUSE}: The blocking thread spins waiting using a loop and also pauses the CPU core in 
@@ -91,45 +97,52 @@ follows the table.
 	be resumed by other threads, being timed out, or upon some hardware state change~\footnote{
                     On Intel platforms, this can be implemented using {\em monitor-mwait}.
                     Blue Gene/Q supported a ``wake-up unit'' for fast thread resumption.
-                     Other processors may have similar features.}. A suspended thread does not consume CPU cycles, 
-		     however the operations of suspending or resuming a thread, also known as putting 
-		     a thread to sleep or to wake up, are costly. 
+                     Other processors may have similar features.}. A suspended thread, also known as sleeping,  
+		     does not consume CPU cycles. 
+		     However the operations of suspending or resuming a thread are costly. 
 		     Thus this approach has the longest response time and 
-		     the kernel can completely occupy the CPU core for other tasks.
+		     the kernel can completely allocate other tasks to the CPU 
+		     core previously used by the thread that is suspended now.
+
+       {\bf PASSIVE TERMINATE}: The thread will be terminated instead of waiting in the runtime. Though not technicall accurate as
+       a ``waiting" policy, it is categorized as the PASSIVE policy because of the same effect of it as the {\sf PASSIVE SUSPEND} policy. 
+       By introducing this policy, 
+       we give users an option to return completely the CPU cores to the system, though the future request of thread requires to
+       recreating the thread. The termination and recreation of a thread cost more than suspending and resuming a thread.  
 
 \subsection{Proposed Runtime Routines} 
-This interoperability proposal is an effort from OpenMP interoperability language subcommittee for addressing
-the oversubscription challenges of OpenMP programs when being executed with other threading library. 
-Our approach provides runtime routines to explose certain functionalities of the runtime systems for users to 
-intrusively adjust the runtime behavior. 
-The solution includes runtime API for providing more information or control to users 
-for the threads in the runtime, 
-%The proposal also provides mechanism for an OpenMP runtime to interact with externals,
-and mechanisms for 
-contributing OpenMP threads for another parallel runtime. 
+%This interoperability proposal is an effort from OpenMP interoperability language subcommittee for addressing
+%the oversubscription challenges of OpenMP programs when being executed with other threading library. 
+Our extensions to OpenMP are runtime routines that can explose 
+certain functionalities of the runtime systems for users to 
+intrusively adjust the behavior of the waiting threads.  
+%These routines  API for providing more information or control to users 
+%for the threads in the runtime, 
+They also include routines for the runtime to contribute OpenMP threads for another parallel runtime, without
+the need to create a {\sf parallel} region. The specifications are included in the follow list. 
 %Parallel programming models such as 
-The proposal introduces the following definition of data types and runtime routines. 
+%The proposal introduces the following definition of data types and runtime routines. 
 
 \lstset{basicstyle=\sffamily\small,language=c, numbersep=1pt}
 \begin{lstlisting}[frame=single]  % Start your code-block
 
-typedef enum omp_thread_state {
-  omp_thread_state_RUN = 0,     /* doing users' work */
-  omp_thread_state_SPIN = 1,    /* busy waiting for work */
-  omp_thread_state_YIELD = 2,   /* yield or yield-spin */
-  omp_thread_state_SLEEP = 3,   /* sleeping */
-  omp_thread_state_KILL = 4,    /* being killed */
+typedef enum omp_wait_policy {
+  OMP_SPIN_BUSY_WAIT = 1,  /* 0x1 */
+  OMP_SPIN_PAUSE_WAIT = 2, /* 0x10 */
+  OMP_SPIN_YIELD_WAIT = 4, /* 0x100 */
+  OMP_SUSPEND_WAIT = 8,    /* 0x1000 */
+  OMP_TERMINATE = 16, /* 0x10000 */
 
-  OMP_ACTIVE_WAIT = omp_thread_state_SPIN,
-  OMP_PASSIVE_WAIT = omp_thread_state_SLEEP;
-} omp_thread_state_t; 
+  OMP_ACTIVE_WAIT = OMP_SPIN_PAUSE_WAIT,
+  OMP_PASSIVE_WAIT = OMP_SUSPEND_WAIT;
+} omp_wait_policy_t; 
 
-int omp_get_num_threads_runtime(omp_thread_state_t state);
+int omp_get_num_threads_runtime(omp_wait_policy_t state);
 
-void omp_set_wait_policy(omp_thread_state_t wait_policy);
+void omp_set_wait_policy(omp_wait_policy_t wait_policy);
 int omp_get_wait_policy(void);
 
-int omp_quiesce(omp_thread_state_t state);
+int omp_quiesce(omp_wait_policy_t state);
 
 typedef void * omp_thread_t;
 int omp_thread_create (omp_thread_t * th, int place,  
@@ -138,32 +151,63 @@ void omp_thread_exit(void *value_ptr);
 int omp_thread_join(omp_thread_t thread, void **value_ptr);
 
 \end{lstlisting}
+The {\sf omp\_wait\_policy\_t} enum defines the valid thread waiting policies that can be passed to the 
+related runtime routines. The value for {\sf OMP\_ACTIVE\_WAIT} and {\sf OMP\_PASSIVE\_WAIT} could be defined
+in the standard. It is also posibble that the standard does not define the five specific policies, and let 
+the implementers specify the meaning of ACTIVE or PASSIVE policies in their implementation. The use of the binary
+position bit (0x1, 0x10, etc) allows for setting multiple wait policies for a thread such that the thread can automatically change
+its waiting behavior according to the needs of the application. 
+%to be defined by the
+%implementers who will  
 
-We use those state as the waiting policy that a user would want the runtime threads to be in and the {\sf omp\_get\_num\_threads\_runtime} API returns the number of runtime threads in the specified state.
+
+%We use those state as the waiting policy that a user would want the runtime threads to be in and the 
+\subsection{The {\sf omp\_get\_num\_threads\_runtime} Runtime Routine}
+This routines return the number of runtime threads that are under the specified policy. The binding thread set 
+of the function is the team threads when being called inside a parallel region, and all the threads in the current 
+contention group when being called in the sequential region. The information provided by calls to this routines can be used 
+by users to make resource management decision when oversubscription become an issue in a program. 
 
 \subsection{The {\sf omp\_set\_wait\_policy} and {\sf omp\_get\_wait\_policy} Runtime Routines}
-The {\sf void omp\_set\_wait\_policy (omp\_thread\_state\_t)} runtime routine sets wait policy of certain 
-native threads. It is important to note that the call to this routine impacts differently for 
-whether it is called inside a {\sf parallel} region or in a sequential region. 
-When being called inside a parallel region, the master thread will make changes of the wait policy for all the team 
-threads. When being called in a sequential region, the root thread will make chanages for all child threads of 
-the contention group led by the root thread. The valid arguments for this call 
-include {\sf omp\_thread\_state\_SPIN}, {\sf omp\_thread\_state\_YIELD}, 
-and {\sf omp\_thread\_state\_SLEEP}. The value of  {\sf OMP\_ACTIVE\_WAIT} and 
-{\sf OMP\_PASSIVE\_WAIT} could be implementation or language defined. The call makes changes of the wait
-policy to each invidual thread, thus thread waiting behavior overrides the default 
+The {\sf omp\_set\_wait\_policy} runtime setter routine sets wait policy of binding thread(s). 
+%It is important to note that the call to this routine impacts differently for 
+When being called inside a {\sf parallel} region, the routine sets the wait policy of the calling thread. 
+%the master thread will make changes of the wait policy for all the team threads. 
+When being called in a sequential region, the routine sets the wait policy for all the 
+d threads of the binding contention group. The {\sf omp\_get\_wait\_policy} routine returns the wait policy 
+of the binding thread if it is being called inside a {\sf parallel} region. If being called in a sequential region, 
+this getter routine returns the wait policy of the contention group if the policy is set before by the setter. 
+If no wait policy has been set for the contention group by the setter, the getter routine returns the wait policies 
+of all the threads as a combined integer. For example, the return value of 0x1011 indicates that OMP\_SUSPEND\_WAIT, 
+OMP\_SPIN\_PAUSE\_WAIT and OMP\_SPIN\_BUSY\_WAIT policies have been set for the threads of the contention group. The
+difference of the binding thread set according to where the setter is called (a {\sf parallel} region or sequential region) 
+allows users to set the policies of the selected threads in a contenton group. For example, the {\sf omp\_set\_wait\_policy(OMP\_PASSIVE\_WAIT)} 
+call in the sequential region followed by the {\sf omp\_set\_wait\_policy(OMP\_ACTIVE\_WAIT)}  
+call inside a {\sf parallel} region enable the setting of those threads that are not part of the {\sf parallel} region to be PASSIVE waiting while
+other threads should be ACTIVE waiting. 
+%The valid arguments for this call 
+%include {\sf omp\_thread\_state\_SPIN}, {\sf omp\_thread\_state\_YIELD}, 
+%and {\sf omp\_thread\_state\_SLEEP}. The value of  {\sf OMP\_ACTIVE\_WAIT} and 
+%{\sf OMP\_PASSIVE\_WAIT} could be implementation or language defined. 
+The setter call makes changes of the wait policy to invidual threads, thus thread waiting behavior overrides the default 
 setting by the wait-policy-var ICV and OMP\_WAIT\_POLICY environment variables. 
-Compilers from IBM, Cray and Oracle have provide similar feature~\cite{ibmwait,craywait,oraclewait}.
+
+The {\sf omp\_set\_wait\_policy} routine can be used for addressing both active and passive oversubscription depending the location of the call to 
+this routine. It is also important to note that compilers from IBM, Cray and Oracle have provide similar feature~\cite{ibmwait,craywait,oraclewait}.
 There are also different variants of this features depending how much details users can configure
-the wait policy.
+the wait policy. For example, Oracle OpenMP runtime allows users to set policies for specific execution point, e.g, at OpenMP 
+barrier or after a parallel region. 
 
 \subsection{The {\sf omp\_quiesce} Runtime Routine}
 The {\sf omp\_quiesce} routine quiesces all OpenMP threads of the runtime according to 
-specified threading behavior by the parameter, which could be SLEEP or KILL. 
-Quiescence may involve termination of threads or otherwise inactivating them. The routine returns zero if quiescence has been achieved, otherwise it returns a non-zero error code.
+specified threading behavior by the argument, which could be either OMP\_SUSPEND\_WAIT or OMP\_TERMINATE. The binding thread set include
+all the threads of the runtime instance. 
+%SLEEP or KILL. 
+Thus quiescence involves termination of threads or otherwise inactivating them. 
+The routine returns zero if quiescence has been achieved, otherwise it returns a non-zero error code.
 
-The two APIs allow a program to dynamically change the behavior of waiting threads or even shutdown the runtime, thus addressing the passive
-oversubscription issue. 
+%The two APIs allow a program to dynamically change the behavior of waiting threads or even shutdown the runtime, thus addressing the passive
+%oversubscription issue. 
 
 
 \subsection{The {\sf omp\_thread\_create/exit/join} Runtime Routines}
@@ -255,15 +299,15 @@ that are busy-waiting, yielding or sleeping. The status of a thread includes RUN
 \lstset{basicstyle=\sffamily\small,language=c, numbersep=1pt}
 \begin{lstlisting}[frame=single]  % Start your code-block
 
-typedef enum omp_thread_state {
-  omp_thread_state_RUN = 0,     /* doing useful work */
-  omp_thread_state_WAIT = 1,    /* busy waiting for work */
-  omp_thread_state_YIELD = 2,   /* yield the CPU */
-  omp_thread_state_SLEEP = 3,   /* sleeping */
-  omp_thread_state_KILL = 4,    /* being killed */
-  omp_thread_state_BLOCK = 5,   /* blocked waiting */
-} omp_thread_state_t; 
-int omp_get_num_threads_runtime(omp_thread_state_t state);
+typedef enum omp_wait_policy {
+  omp_wait_policy_RUN = 0,     /* doing useful work */
+  omp_wait_policy_WAIT = 1,    /* busy waiting for work */
+  omp_wait_policy_YIELD = 2,   /* yield the CPU */
+  omp_wait_policy_SLEEP = 3,   /* sleeping */
+  omp_wait_policy_KILL = 4,    /* being killed */
+  omp_wait_policy_BLOCK = 5,   /* blocked waiting */
+} omp_wait_policy_t; 
+int omp_get_num_threads_runtime(omp_wait_policy_t state);
 \end{lstlisting}
 
 By using the API, a program would be able to claims or allocate appropriate amount of resources based on how many are occupied by the OpenMP
@@ -274,8 +318,8 @@ In this level, APIs are defined for adjusting the runtime behavior of the runtim
 
 \begin{lstlisting}[frame=single]
 void omp_set_dynamic(int dyn_threads); /*in standard already*/
-void omp_set_wait_policy(omp_thread_state_t wait_policy);
-int omp_quiesce(omp_thread_state_t state);
+void omp_set_wait_policy(omp_wait_policy_t wait_policy);
+int omp_quiesce(omp_wait_policy_t state);
 \end{lstlisting}
 The {\sf omp\_set\_dynamic} is already in the standard. 
 

@@ -1,16 +1,24 @@
-The implementation is performed in both Intel OpenMP runtime (iOMP) Version 20160322 and GNU Compiler Runtime (GOMP) version 6.1.0. 
-we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
-{\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
-Table~\ref{table:implement_wait} shows different wait policies and implementation psedudo code snippets. 
+The implementation is performed in the latest Intel OpenMP runtime (iOMP) and GNU Compiler Runtime (gOMP). % version 6.1.0. 
+%we highlight the implementation and evaluation of some of the functions in Level 2 and 3: 
+%{\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
 
 For iOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
 implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
-wait policy of a thread to the {\sf SLEEP} policy is implemented by setting thread-specific variables. For
-supporting changing policies to either {\sf SPIN} or {\sf YIELD}, the implementation needs to include codes for 
-waking up those threads who are sleeping by using the provided thread suspension and resumption mechanisms.  
-The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex and 
-we validate the effectiveness of our implementation by checking the kernel state of the program state when being 
-executed.
+the {\sf OMP\_SUSPEND\_WAIT} policy is implemented by setting thread-specific variables. For
+supporting changing policies to one of the {\sf ACTIVE} policies or the {\sf OMP\_SPIN\_YIELD} policy, 
+the implementation needs resuming those suspended threads. %by using the provided thread suspension and resumption mechanisms.  
+The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex.  
+We validate the effectiveness of our implementation by checking the kernel state (in /proc/ RAM file system on Linux) 
+of each thread of a program when being executed. 
+The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
+should change the behavior of all the threads when it is called with {\sf OMP\_SUSPENDED\_WAIT} argument. 
+%{\sf ACTIVE} and {\sf PASSIVE}
+%environment setting for {\sf OMP\_WAIT\_POLICY} and the corresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
+%use of {\sf KMP\_BLOCKTIME} and {\sf kmp\_set\_blocktime} for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
+The implementation of {\sf omp\_quiesce(OMP\_TERMINATE)} is a wrapper of 
+the {\sf \_\_kmp\_internal\_end\_fini} internal API which shuts down the runtime system~\cite{iccmanual}. 
+
+
 
 \begin{comment}
 
@@ -54,31 +62,29 @@ The thread behaves in the waiting state according to the policies specified by c
 \end{algorithm} 
 
 \end{comment}
-
-The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
-should change the behavior of all the threads when it is called with SLEEP argument. 
-%{\sf ACTIVE} and {\sf PASSIVE}
-%environment setting for {\sf OMP\_WAIT\_POLICY} and the corresponding ICV, the use of turnaround and throughput mode for OpenMP execution, the 
-%use of {\sf KMP\_BLOCKTIME} and {\sf kmp\_set\_blocktime} for setting the waiting time before putting a thread to sleep~\cite{iccmanual}, 
-The implementation of {\sf omp\_quiesce(omp\_thread\_state\_KILL)} is a wrapper of 
-the {\sf \_\_kmp\_internal\_end\_fini} internal API which shuts down the runtime system~\cite{iccmanual}. 
-
-
 The implementation of  {\sf omp\_thread\_create/exit/join} needs to work around the need of a team when creating a thread, and the requirement 
 of a fork barrier and join barrier when assigning any work to a thread in the runtime. An internal team object is created when creating a thread 
 using the {\sf omp\_thread\_create} function. The implementation will first check the thread pool to find a waiting thread. If there is no thread
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
 The {\sf omp\_thread\_join} function is realized using a join counter. 
-The total amount changes to iOMP are about 200 lines of code, thus requiring small amount of efforts.  
+%The total amount changes to iOMP are about 200 lines of code, thus requiring small amount of efforts.  
 
-For GOMP, implementation is very similar. GOMP uses a spin count to control how long a thread waits actively
-before waiting passively. On Linux systems, busy wait is implemented by running a loop checking the waiting condition
-and calling cpu\_relax() if the condition is not met, as shown in the SPIN\_PAUSE policy in Table~\ref{table:implement_wait}.
-Passive waiting is implemented by calling mutex\_wait() and mutex\_wake(), as shown in the SLEEP policy in the table. 
-Our implementation of {\sf omp\_set\_wait\_policy} sets the spin count to be 0 if we want PASSIVE waiting, or
-a largest integer number possible if an active waiting is desired.
-The implementation of {\sf omp\_quiesce(omp\_thread\_state\_KILL)} is a wrapper of {\sf gomp\_free\_thread} which frees a thread pool and releases its threads. 
+For gOMP, the implementation is very similar to iOMP.
+Both iOMP and gOMP use timeout mechanism (blocktime in iOMP and spincount in gOMP) 
+to control how long a thread waits actively before waiting passively. The implementations set the timeout value to either 0 or the max integer 
+for {\sf PASSIVE} waiting or {\sf ACTIVE} waiting, respectively. 
+For the wait policies, Table~\ref{table:implement_wait} shows implementation psedudo code snippets applicable to both of 
+the two runtime systems, though for gOMP, the cpu\_pause function is called cpu\_relax().  
+The gOMP implementation of {\sf omp\_quiesce(OMP\_TERMINATE)} is a wrapper of {\sf gomp\_free\_thread} 
+which frees a thread pool and releases its threads. 
+
+
+%GOMP uses a spin count toOn Linux systems, busy wait is implemented by running a loop checking the waiting condition
+%and calling cpu\_relax() if the condition is not met, as shown in the SPIN\_PAUSE policy in Table~\ref{table:implement_wait}.
+%Passive waiting is implemented by calling mutex\_wait() and mutex\_wake(), as shown in the SLEEP policy in the table. 
+%Our implementation of {\sf omp\_set\_wait\_policy} sets the spin count to be 0 if we want PASSIVE waiting, or
+%a largest integer number possible if an active waiting is desired.
 
 \REM{
 In general, to implement those four functions, we follow the three steps:
