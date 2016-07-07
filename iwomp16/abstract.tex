@@ -3,7 +3,7 @@ for developing multi-threaded applications.
 However, there are still some challenges in terms of OpenMP's interoperability
 with itself and other parallel programming languages and libraries.
 In this paper, we explore typical use cases that expose OpenMP's interoperability challenges and
-report our propose solutions for addressing the resource oversubscription issue as the efforts
+report our proposed solutions for addressing the resource oversubscription issue as the efforts
 by the OpenMP Interoperability language subcommittee. 
 %which address one of more aspects of OpenMP's interoperability problem.
 The solutions include OpenMP runtime routines for
@@ -14,7 +14,7 @@ routines for supporting contributing OpenMP threads to other thread libraries or
 Our initial implementations are being done by extending two OpenMP runtime libraries, 
 Intel OpenMP (iOMP) and GNU OpenMP (gOMP).
 The evaluation results demonstrate the effectiveness of the proposed approach to address the resource 
-oversubscription challenges and detailed analysis provide heuristics for selecting wait policy according
+oversubscription challenge and detailed analysis provide heuristics for selecting an optimal wait policy according
 to the oversubscription ratios. 
 
 
