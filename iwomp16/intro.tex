@@ -41,7 +41,7 @@ libraries such as Intel Math Kernel Library (MKL)~\cite{wang2014intel}.
 Each of these APIs often has its own runtime system to handle scheduling of work units 
 and management of computational and data movement tasks. 
 One of the challenges for using multiple models in one application is the interoperability and
-interaction of their threading runtime, for example the issues of naming conflicts and resource
+interaction of their threading runtimes, for example the issues of naming conflicts and resource
 oversubscription. 
 
 %. Composability are closely related, while the interoperability sounds to improve the interactions between multiple models
@@ -52,9 +52,9 @@ This paper reports our proposal to OpenMP for combating the resource oversubscri
 the OpenMP Interoperability language subcommittee. The work makes three contributions: 1) a study 
 of interoperability challenge in OpenMP and other parallel APIs and the limitation 
 of the current standard to address this challenge; 2) proposed extensions to OpenMP to improve the thread
-management to enhance OpenMP to interoperate with other threading models; 3) evaluation and performance
-study that demonstrate the effectiveness of the proposed solution and provide guideline for selecting thread
-waiting policies according to the oversubscription ratios. 
+management to enhance OpenMP's interoperability with other threading models; 3) evaluation and performance
+study that demonstrate the effectiveness of the proposed solution and guidelines for selecting thread
+wait policies according to the oversubscription ratios. 
 %Though proposed as OpenMP extensions, the solution 
 %and approach are applicable to other threading libraries and parallel programming languages. 
 We think the similar challenge exists in other threading based libraries and language implementations, and believe
