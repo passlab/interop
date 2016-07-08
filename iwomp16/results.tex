@@ -44,6 +44,22 @@ destroy all the resources allocated for the runtime (e.g. mutex, condition varia
 Our next evaluation was designed to measure the execution time of hybrid PThread/OpenMP programs when different
 wait policies are applied. We developed a program in which multiple PThreads are created, 
 each of which executes the function shown in the following list. 
+%footnotesize
+\lstset{basicstyle=\sffamily\scriptsize,language=c, numbersep=1pt}
+\begin{lstlisting}[frame=single]  % Start your code-block
+void *omp_parallel_foo(void *ptr ) {   
+    int user_thread_id = (int) ptr;
+    for (int i=0; i<NUM_ITERATIONS; i++) {
+        busy_waiting(user_thread_id*3000);
+#pragma omp parallel num_threads(num_ompthreads)
+        {   
+            busy_waiting(3000); /* act as computation */
+        }
+        omp_set_wait_policy(policy);
+    }
+}
+\end{lstlisting}
+
 Each PThread first spin-waits for a specific period of time, and  
 then enters into a {\sf parallel} region in which it mimics computation by performing busy-waiting for 3000 us.
 The time periods of the two busy waiting (one is in sequential and the other is in {\sf parallel}) are carefully designed for
@@ -61,24 +77,6 @@ In this test case, we define two crosspoints as the number of total threads in t
 The first crosspoint (\#1) is when oversubscription
 over the total number of cores (36 cores) happens and the second one (\#2) is when oversubscription
 over the total number of {\it hardware threads} (72) happens. 
-
-
-\lstset{basicstyle=\sffamily\footnotesize,language=c, numbersep=1pt}
-\begin{lstlisting}[frame=single]  % Start your code-block
-
-void *omp_parallel_foo(void *ptr ) {   
-    int user_thread_id = (int) ptr;
-    for (int i=0; i<NUM_ITERATIONS; i++) {
-        busy_waiting(user_thread_id*3000);
-#pragma omp parallel num_threads(num_ompthreads)
-        {   
-            busy_waiting(3000); /* act as computation */
-        }
-        omp_set_wait_policy(policy);
-    }
-}
-
-\end{lstlisting}
 
 
 \begin{figure}[h]
@@ -149,7 +147,7 @@ When the ratio is above 4.0 (heavy oversubscription), the {\sf PASSIVE SUSPEND} 
     \label{fig:ovratio}
 \end{figure}
 
-In summary, the evaluation demonstrates the effectiveness of using different wait policies for combating the performance 
+In summary, the evaluation demonstrates the effectiveness of using wait policies for combating the performance 
 impacts of oversubscription. Heuristics for selecting the right policy 
 could be drawn from this single but representative experiment as follows:
 the {\sf ACTIVE SPIN\_BUSY} or {SPIN\_PAUSE} policy should be used when there is no oversubscription. 
