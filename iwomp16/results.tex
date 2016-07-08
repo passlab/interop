@@ -45,7 +45,7 @@ Our next evaluation was designed to measure the execution time of hybrid PThread
 wait policies are applied. We developed a program in which multiple PThreads are created, 
 each of which executes the function shown in the following list. 
 %footnotesize
-\lstset{basicstyle=\sffamily\scriptsize,language=c, numbersep=1pt}
+\lstset{basicstyle=\sffamily\footnotesize,language=c, numbersep=1pt}
 \begin{lstlisting}[frame=single]  % Start your code-block
 void *omp_parallel_foo(void *ptr ) {   
     int user_thread_id = (int) ptr;
@@ -85,18 +85,6 @@ over the total number of {\it hardware threads} (72) happens.
     \label{fig:2PThread_performance}
 \end{figure}
 
-\begin{figure}[h]
-    \includegraphics[width=0.99\textwidth] {images/4PThread_performance}
-    \caption{Performance (ms) for hybrid PThreads/OpenMP execution (4 PThreads)}
-    \label{fig:4PThread_performance}
-\end{figure}
-
-\begin{figure}[h]
-    \includegraphics[width=0.99\textwidth] {images/8PThread_performance}
-    \caption{Performance (ms) for hybrid PThreads/OpenMP execution (8 PThreads)}
-    \label{fig:8PThread_performance}
-\end{figure}
-
 The evaluation results using 2, 4, and 8 PThreads, each of which creates {\sf parallel} region ranging 
 from 2 to 72 threads, are shown in Figure~\ref{fig:2PThread_performance},~\ref{fig:4PThread_performance} 
 and~\ref{fig:8PThread_performance}. The two crosspoints for each configuration are marked in the figures and the 
@@ -113,6 +101,20 @@ The results also show that there are not much changes of the performance by thos
 %It is very interesting that the YIELD policy performs
 %consistently better than SPIN policy, indicating that even there is no oversubscription, SPIN waiting is not 
 %the best option for optimal interoperability and performance.
+
+
+\begin{figure}[h]
+    \includegraphics[width=0.99\textwidth] {images/4PThread_performance}
+    \caption{Performance (ms) for hybrid PThreads/OpenMP execution (4 PThreads)}
+    \label{fig:4PThread_performance}
+\end{figure}
+
+\begin{figure}[h]
+    \includegraphics[width=0.99\textwidth] {images/8PThread_performance}
+    \caption{Performance (ms) for hybrid PThreads/OpenMP execution (8 PThreads)}
+    \label{fig:8PThread_performance}
+\end{figure}
+
 
 After passing the crosspoint \#2, the results clearly show that using the {\sf ACTIVE SPIN\_BUSY} 
 policy dramatically increases the execution time (5x to 10x).
