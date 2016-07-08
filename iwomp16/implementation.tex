@@ -3,12 +3,13 @@ The implementation is performed in the latest Intel OpenMP runtime (IOMP) and GN
 %{\sf omp\_set\_wait\_policy}, {\sf omp\_quiesce} and {\sf omp\_thread\_create/exit/join}. 
 
 For IOMP, the implementation of {\sf omp\_set\_wait\_policy} leverages the available 
-implementation of suspending and resuming a thread used for the barrier implementation. Setting the 
-the {\sf OMP\_SUSPEND\_WAIT} policy is implemented by setting thread-specific variables. For
-supporting changing policies to one of the {\sf ACTIVE} policies or the {\sf OMP\_SPIN\_YIELD} policy, 
+implementation of suspending and resuming a thread (using pthread condition variable and mutex) 
+used for the barrier. Setting  
+{\sf OMP\_SUSPEND\_WAIT} policy is implemented by setting thread-specific variables. For
+setting the {\sf ACTIVE} policies or the {\sf OMP\_SPIN\_YIELD} policy, 
 the implementation needs resuming those suspended threads. %by using the provided thread suspension and resumption mechanisms.  
-The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex.  
-We validate the effectiveness of our implementation by checking the kernel state (in /proc/ RAM file system on Linux) 
+%The thread suspension and resumption functionalities are implemented using pthread condition variable and mutex.  
+We validate the correctness of our implementation by checking the kernel state (in /proc/ RAM file system on Linux) 
 of each thread of a program when being executed. 
 The {\sf omp\_quiesce} implementation leverages the support for {\sf omp\_set\_wait\_policy} except that it 
 should change the behavior of all the threads when it is called with {\sf OMP\_SUSPENDED\_WAIT} argument. 
@@ -64,17 +65,17 @@ The thread behaves in the waiting state according to the policies specified by c
 \end{comment}
 The implementation of  {\sf omp\_thread\_create/exit/join} needs to work around the need of a team when creating a thread, and the requirement 
 of a fork barrier and join barrier when assigning any work to a thread in the runtime. An internal team object is created when creating a thread 
-using the {\sf omp\_thread\_create} function. The implementation will first check the thread pool to find a waiting thread. If there is no thread
+using the {\sf omp\_thread\_create} function. The implementation first checks the thread pool to find a waiting thread. If there is no thread
 in the pool, it creates a native thread (PThread in Unix/Linux) launching into the runtime loop. The thread will be released for performing
 user specified routine by the fork barrier. But it will skip the join barrier since it does not form a team with any other thread. 
-The {\sf omp\_thread\_join} function is realized using a join counter. 
+%The {\sf omp\_thread\_join} function is realized using a join counter. 
 %The total amount changes to IOMP are about 200 lines of code, thus requiring small amount of efforts.  
 
 For GOMP, the implementation is very similar to IOMP.
-Both IOMP and GOMP use timeout mechanism (blocktime in IOMP and spincount in GOMP) 
+Both IOMP and GOMP use timeout mechanism (blocktime in IOMP and spin count in GOMP) 
 to control how long a thread waits actively before waiting passively. The implementations set the timeout value to either 0 or the max integer 
 for {\sf PASSIVE} waiting or {\sf ACTIVE} waiting, respectively. 
-For the wait policies, Table~\ref{table:implement_wait} shows implementation psedudo code snippets applicable to both of 
+For the wait policies, Table~\ref{table:implement_wait} shows implementation pseudo code snippets applicable to both of 
 the two runtime systems, though for GOMP, the cpu\_pause function is called cpu\_relax().  
 The GOMP implementation of {\sf omp\_quiesce(OMP\_TERMINATE)} is a wrapper of {\sf gomp\_free\_thread} 
 which frees a thread pool and releases its threads. 

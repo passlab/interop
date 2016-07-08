@@ -22,7 +22,7 @@ We have studied the waiting policy of the OpenMP and how the current OpenMP Runt
 In addition, we have implemented a new function to shutdown the whole runtime library when exiting the parallel region. Since all threads are maintained in the same thread pool, quiesce will reap every threads to free the memory, which sometimes help to clear the runtime environment when the task density is lower and we don’t need to wake up most of the thread in the thread pool. However, when entering new parallel regions, we need to make sure that we register the current working thread as our root thread, so that new runtime environment can be built on it. It cost time to restart another parallel region, thus works slower when lots of tasks in the task queue.
 \end{comment}
 
-For future work, we will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of OpenMP runtime systems with our extensions.
-We will also investigate how to avoid conflicting thread affinity and explore challenges of using multiple instances of OpenMP runtimes.
+For future work, we will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of our extensions.
+We will investigate to address thread affinity conflict issue and other interoperability challenges. % explore challenges of using multiple instances of OpenMP runtimes.
 %adding more proposed interoperability functionalities into the existing runtime systems. We will conduct in-depth evaluation using representative benchmarks to demonstrate the benefits of OpenMP runtime systems with better interoperability. 
 %By doing this, we could have a better OpenMP runtime library that optimizes the resources utilization.
