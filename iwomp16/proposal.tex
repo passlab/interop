@@ -18,13 +18,13 @@ region is finished at the join barrier. While in the
 thread pool, a native thread blocks in a fork barrier. 
 OpenMP runtime may also
 %Instead of moving the blocking thread to the thread pool, 
-maintains internal hot teams that keep threads actively waiting for the upcoming {\sf parallel} regions. 
+maintain internal hot teams that keep threads actively waiting for the upcoming {\sf parallel} regions. 
 %in which threads are busy-waiting for work even if the program is in the sequential stage. 
-So an OpenMP program could consumes cycles of multiple CPU cores even if it is in sequential execution stage.
+So an OpenMP program could consume cycles of multiple CPU cores even if it is in sequential execution stages.
 
-It is also often that an OpenMP program explicitly create native threads, e.g. PThreads, and each native thread has
-its own OpenMP {\sf parallel} region. 
-In such hybrid threading model (user-level native thread and OpenMP thread), 
+Often an OpenMP program explicitly creates native threads, e.g. PThreads, and each native thread has
+its own OpenMP {\sf parallel} regions. 
+In such a hybrid threading model (using user-level native threads and OpenMP threads), 
 a runtime maintains internal descendant hierarchies for the native threads created by users and
 those by the OpenMP runtime. Borrowing the term from Intel OpenMP runtime, we refer to 
 the native threads created by users as root threads. 
@@ -36,18 +36,18 @@ The oversubscription challenge is then concerned with how
 to coordinate the CPU resource sharing between two or more contention groups, and between multiple 
 runtime instances, which could be of the same or different runtime libraries. 
 Our solutions for addressing it provide users APIs for 
-dynamically setting the wait policy of the blocking thread to minimize 
+dynamically setting the wait policy of the blocking threads to minimize 
 the consumption of CPU cycles when idling. 
 %so threadsthat do not do useful work consume minimum CPU cycles. 
 
 
 \subsection{Definition of the {\sf ACTIVE} and {\sf PASSIVE} Wait Policies}
 Our proposal defines more specifically 
-the {\sf ACTIVE} and {\sf PASSIVE} policies and also extends each to include multiple policies that dictate more
+the {\sf ACTIVE} and {\sf PASSIVE} policies and also extends each to include multiple sub-policies that dictate more
 specifically the exact behavior of the waiting thread. 
-When a thread is waiting in {\sf ACTIVE} state, it should not initiate calls to
+When a thread is waiting in an {\sf ACTIVE} state, it should not initiate calls to
 relinquish the CPU, though technically the OS kernel or hardware may switch it out of the core it occupies. 
-When in {\sf PASSIVE} state, a thread initiates yielding or suspension operation to give up the CPU core. 
+When in a {\sf PASSIVE} state, a thread initiates yielding or suspension operation to give up the CPU core. 
 The extensions of each of the policies are summarized in Table~\ref{table:implement_wait} and detailed description
  are as follows. % the table. 
 \begin{table}[ht]
@@ -82,16 +82,16 @@ The extensions of each of the policies are summarized in Table~\ref{table:implem
 
 	{\bf ACTIVE SPIN\_PAUSE}: The blocking thread waits using a loop and also pauses the CPU core in 
 	each loop iteration. The pause operation introduces a slight delay in the loop, reducing the amount 
-	of instructions fed into the pipeline as well as the energy consumption. This policy also allows 
-	for very fast response time but consuming much less amount of CPU cycles 
+	of instructions fed into the CPU pipeline as well as the energy consumption. This policy also allows 
+	for very fast response time but consumes less amount of CPU cycles 
 	and memory bandwidth than the {\sf SPIN\_BUSY} policy.
 
 	{\bf PASSIVE SPIN\_YIELD}:  The blocking thread waits using a loop and 
-	relinquishes the CPU in each iteration by kernel system call (e.g. {\em sched\_yield}). CPU yielding causes
+	relinquishes the CPU in each iteration by a kernel system call (e.g. {\em sched\_yield}). CPU yielding causes
 	the thread to be moved to the end of the kernel scheduling queue for its static priority. A thread in this 
-		stage can only be released to the OpenMP runtime by the kernel. Kernel context switch is involved
+		stage can only be released to the OpenMP runtime by the kernel. A kernel context switch is involved
 		in each loop iteration, thus having higher overhead than the two {\sf ACTIVE} policies. 
-		This policy provides average response time, but allows kernel to schedule other tasks to the same
+		This policy provides average response time, but allows the kernel to schedule other tasks to the same
 		CPU core while the thread yields. 
 
 	{\bf PASSIVE SUSPEND}: The thread is suspended when waiting in the barrier call. A suspended thread can only
@@ -116,7 +116,7 @@ The extensions of each of the policies are summarized in Table~\ref{table:implem
 %the oversubscription challenges of OpenMP programs when being executed with other threading library. 
 Our extensions to OpenMP are runtime routines that can expose 
 certain functionalities of the runtime system for users to 
-intrusively adjust the behavior of the waiting threads.  
+proactively adjust the behavior of the waiting threads.  
 %These routines  API for providing more information or control to users 
 %for the threads in the runtime, 
 They also include routines for the runtime to contribute OpenMP threads for another parallel runtime, without
@@ -155,7 +155,7 @@ int omp_thread_join(omp_thread_t thread, void **value_ptr);
 The {\sf omp\_wait\_policy\_t} enum defines the valid thread wait policies that can be passed to the 
 related runtime routines. The value for {\sf OMP\_ACTIVE\_WAIT} and {\sf OMP\_PASSIVE\_WAIT} could be defined
 in the standard. It is also possible that the standard does not define the five specific policies, and let 
-the implementers specify the meaning of {\sf ACTIVE} or {\sf PASSIVE} policies in their implementation. The use of the binary
+the implementations specify the meaning of {\sf ACTIVE} or {\sf PASSIVE} policies. The use of the binary
 position bit (0x1, 0x10, etc) as values allows for setting multiple wait policies for a thread such that the thread can automatically change
 its waiting behavior according to the needs of the application. 
 %to be defined by the
@@ -164,13 +164,13 @@ its waiting behavior according to the needs of the application.
 
 %We use those state as the wait policy that a user would want the runtime threads to be in and the 
 \subsection{The {\sf omp\_get\_num\_threads\_runtime} Runtime Routine}
-This routines return the number of runtime threads that are under the specified policy. The binding thread set 
+This routine returns the number of runtime threads that are under the specified policy. The binding thread set 
 of the function is the team threads when being called inside a {\sf parallel} region, and all the threads in the current 
 contention group when being called in the sequential region. The information provided by calls to this routines can be used 
-by users to make resource management decision when oversubscription become an issue in a program. 
+by users to make resource management decisions when oversubscription become an issue in a program. 
 
 \subsection{The {\sf omp\_set\_wait\_policy} and {\sf omp\_get\_wait\_policy} Runtime Routines}
-The {\sf omp\_set\_wait\_policy} runtime setter routine sets wait policy of binding thread(s). 
+The {\sf omp\_set\_wait\_policy} runtime setter routine sets the wait policy of binding thread(s). 
 %It is important to note that the call to this routine impacts differently for 
 When being called inside a {\sf parallel} region, the routine sets the wait policy of the calling thread. 
 %the master thread will make changes of the wait policy for all the team threads. 
@@ -203,9 +203,9 @@ barrier or after a {\sf parallel} region.
 
 \subsection{The {\sf omp\_quiesce} Runtime Routine}
 The {\sf omp\_quiesce} routine quiesces all OpenMP threads of the runtime according to 
-specified threading behavior by the argument, which could be either {\sf OMP\_SUSPEND\_WAIT} or {\sf OMP\_TERMINATE}. 
+sthe pecified threading behavior by the argument, which could be either {\sf OMP\_SUSPEND\_WAIT} or {\sf OMP\_TERMINATE}. 
 Thus quiescence involves termination of threads or otherwise inactivating them. 
-The binding thread set include all the threads of the runtime instance. 
+The binding thread set includes all the threads of the runtime instance. 
 %SLEEP or KILL. 
 The routine returns zero if quiescence has been achieved, otherwise it returns a non-zero error code.
 
@@ -218,7 +218,7 @@ The routine returns zero if quiescence has been achieved, otherwise it returns a
 The {\sf omp\_thread\_create/exit/join} APIs are introduced for users to create OpenMP threads similarly as the way of creating
 PThreads. Those threads however are tracked by the OpenMP runtime, though they do not belong to any thread team. 
 The {\sf place} parameter is used for specifying the place where the thread should be created from.  
-By using those APIs, an OpenMP thread can be created as regular thread without using OpenMP {\sf parallel} region. 
+By using those APIs, an OpenMP thread can be created as regular thread without creating an OpenMP {\sf parallel} region. 
 Those threads can be used to form another parallel runtime for other programming
 models. 
 
