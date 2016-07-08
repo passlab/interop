@@ -2,12 +2,12 @@ The evaluation was performed on a machine using two Intel\regtm{} Xeon\regtm{} E
 LLVM compiler version 3.8.0 for evaluating IOMP implementation. Test programs were designed to evaluate the overhead of these functions. 
 %\subsubsection{{\sf omp\_quiesce}}
 
-We first developed microbenchmarks for evaluating parallel start-up cost after applying different wait policy or 
+We first developed microbenchmarks for evaluating parallel start-up cost after applying different wait polices or 
 quiescing the runtime system, as well as the cost for the {\sf omp\_set\_wait\_policy} and {\sf omp\_quiesce} 
 routines.  
 Figure~\ref{omp:overhead_table} shows the results of the evaluation. 
 The use of each of the two {\sf ACTIVE} policies and the {\sf PASSIVE SPIN\_YIELD} policy 
-introduce very minimum overhead to the {\sf parallel} region start-up. 
+introduces very minimum overhead to the {\sf parallel} region start-up. 
 When {\sf PASSIVE SUSPEND} policy is applied, we observed significant increase of overhead of creating {\sf parallel} regions, 
 which can be explained by the cost to suspend and resume the runtime threads when the policy is in effect. 
 The use of {\sf omp\_quiesce} with {\sf TERMINATE} policy, which completely shutdowns the 
@@ -41,11 +41,11 @@ destroy all the resources allocated for the runtime (e.g. mutex, condition varia
 \end{figure}
 }
 
-Our next evaluation was designed to measure the execution time of hybrid PThread/OpenMP program when different
-wait policies are applied. We develop a program in which multiple PThreads are created, 
+Our next evaluation was designed to measure the execution time of hybrid PThread/OpenMP programs when different
+wait policies are applied. We developed a program in which multiple PThreads are created, 
 each of which executes the function shown in the following list. 
-Each PThread first spins waiting for a specific period of time, and  
-then enters into a {\sf parallel} region in which it acts computation by performing busy-waiting for 3000 us.
+Each PThread first spin-waits for a specific period of time, and  
+then enters into a {\sf parallel} region in which it mimics computation by performing busy-waiting for 3000 us.
 The time periods of the two busy waiting (one is in sequential and the other is in {\sf parallel}) are carefully designed for
 all PThreads so only one PThread enters into its {\sf parallel} region a time. 
 By this design, if the {\sf parallel} region of each PThread has N number of threads, which is less than or equal to 
@@ -56,7 +56,7 @@ When there are enough cores or {\it hardware threads} to support all threads (in
 which means no oversubscription, minimum scheduling overhead and context switch are incurred, thus achieving optimal 
 performance. If the total number of threads are 
 greater than the total number of {\it hardware threads} in the system, the runtime system and OS kernel 
-needs to schedule those threads among the {\it hardware threads}, which stress-tests the effectiveness of different wait policies. 
+need to schedule those threads among the {\it hardware threads}, which stress-tests the effectiveness of different wait policies. 
 In this test case, we define two crosspoints as the number of total threads in the program. 
 The first crosspoint (\#1) is when oversubscription
 over the total number of cores (36 cores) happens and the second one (\#2) is when oversubscription
@@ -101,15 +101,15 @@ void *omp_parallel_foo(void *ptr ) {
 
 The evaluation results using 2, 4, and 8 PThreads, each of which creates {\sf parallel} region ranging 
 from 2 to 72 threads, are shown in Figure~\ref{fig:2PThread_performance},~\ref{fig:4PThread_performance} 
-and~\ref{fig:8PThread_performance}. The two crosspoints for each configuration are marked in the figure and the 
-policy that delivers the best performance is highlighted in green color and the worst performance in red color.
-The results clearly show the effectiveness of using wait policies. For all the three configurations, 
+and~\ref{fig:8PThread_performance}. The two crosspoints for each configuration are marked in the figures and the 
+policy that delivers the best performance is highlighted in green and the worst performance in red.
+The results clearly show the significant impact of using different wait policies. For all the three configurations, 
 before the crosspoint \#2 from which oversubscription just starts to occur, 
 the two {\sf ACTIVE} wait polices ({\sf SPIN\_BUSY} and {\sf SPIN\_PAUSE}), deliver the best performance and 
 the {\sf PASSIVE SUSPEND} delivers the worst (max 2x time slower). 
 The {\sf PASSIVE SPIN\_YIELD} delivers slightly worse performance than the two {\sf ACTIVE} policies, but still much better than the 
 {\sf PASSIVE SUSPEND} policy. 
-It can be explained that minimum overhead from OS kernel scheduling and context switch are incurred for the {\sf ACTIVE} policies since 
+It can be explained that minimum overhead from OS kernel scheduling and context switches are incurred for the {\sf ACTIVE} policies since 
 the program does not oversubscribe the hardware threads. 
 The results also show that there are not much changes of the performance by those policies when crossing the crosspoint \#1. 
 %It is very interesting that the YIELD policy performs
@@ -118,7 +118,7 @@ The results also show that there are not much changes of the performance by thos
 
 After passing the crosspoint \#2, the results clearly show that using the {\sf ACTIVE SPIN\_BUSY} 
 policy dramatically increases the execution time (5x to 10x).
-This policy does not help address oversubscription because of the large amount of overhead from OS kernel thread scheduling and context switch 
+This policy does not help address oversubscription because of the large amount of overhead from OS kernel scheduling and context switches 
 incurred when the threads are competing for hardware cores. The mild increase
 of the execution time when using either {\sf ACTIVE SPIN\_PAUSE} or {\sf PASSIVE SPIN\_YIELD} 
 policy clearly shows the effect of the two policies to address
@@ -127,10 +127,10 @@ We also observed that the two policies consistently outperform the {\sf PASSIVE 
 policy (20\% to 40\%) for the configuration using 2 and 4 PThreads. The 8-PThread configuration shows that the 
  {\sf PASSIVE SUSPEND} policy outperforms the other policies from 39 OpenMP threads/PThread on wards for as much as 35\%. 
  This indicates that for a program that heavily oversubscribes hardware resources, the {\sf PASSIVE SUSPEND} 
- policy is a better option among the four.
+ policy is the best option among the four.
 
 \subsection{Performance With Regards to the Oversubscription Ratio}
-To future study the effects of the four policies, % and the guideline for selecting an optimal policy for different configurations, 
+To further study the effects of the four policies, % and the guideline for selecting an optimal policy for different configurations, 
 we introduce the term ``oversubscription ratio'' as the ratio of total number of
 threads requested by a program to the total number of hardware threads. 
 %If the ratio is less than or equal to 1,
@@ -149,10 +149,10 @@ When the ratio is above 4.0 (heavy oversubscription), the {\sf PASSIVE SUSPEND} 
     \label{fig:ovratio}
 \end{figure}
 
-As a summary, the evaluation demonstrates the effectiveness of the wait policy for combating the performance 
+In summary, the evaluation demonstrates the effectiveness of using different wait policies for combating the performance 
 impacts of oversubscription. Heuristics for selecting the right policy 
 could be drawn from this single but representative experiment as follows:
-The {\sf ACTIVE SPIN\_BUSY} or {SPIN\_PAUSE} policy should be used when there is no oversubscription. 
+the {\sf ACTIVE SPIN\_BUSY} or {SPIN\_PAUSE} policy should be used when there is no oversubscription. 
 For mild oversubscription (ratio less than 4), both {\sf ACTIVE SPIN\_PAUSE} and {\sf PASSIVE SPIN\_YIELD} are good options. 
 For heavily oversubscribed system (ratio greater than 4), the {\sf PASSIVE SUSPEND} policy should be 
 considered to coordinate resources between parallel runtime. 
