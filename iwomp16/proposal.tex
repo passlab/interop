@@ -36,7 +36,7 @@ The oversubscription challenge is then concerned with how
 to coordinate the CPU resource sharing between two or more contention groups, and between multiple 
 runtime instances, which could be of the same or different runtime libraries. 
 Our solutions for addressing it provide users APIs for 
-dynamically setting the waiting policy of the blocking thread to minimize 
+dynamically setting the wait policy of the blocking thread to minimize 
 the consumption of CPU cycles when idling. 
 %so threadsthat do not do useful work consume minimum CPU cycles. 
 
@@ -152,7 +152,7 @@ void omp_thread_exit(void *value_ptr);
 int omp_thread_join(omp_thread_t thread, void **value_ptr);
 
 \end{lstlisting}
-The {\sf omp\_wait\_policy\_t} enum defines the valid thread waiting policies that can be passed to the 
+The {\sf omp\_wait\_policy\_t} enum defines the valid thread wait policies that can be passed to the 
 related runtime routines. The value for {\sf OMP\_ACTIVE\_WAIT} and {\sf OMP\_PASSIVE\_WAIT} could be defined
 in the standard. It is also possible that the standard does not define the five specific policies, and let 
 the implementers specify the meaning of {\sf ACTIVE} or {\sf PASSIVE} policies in their implementation. The use of the binary
@@ -162,7 +162,7 @@ its waiting behavior according to the needs of the application.
 %implementers who will  
 
 
-%We use those state as the waiting policy that a user would want the runtime threads to be in and the 
+%We use those state as the wait policy that a user would want the runtime threads to be in and the 
 \subsection{The {\sf omp\_get\_num\_threads\_runtime} Runtime Routine}
 This routines return the number of runtime threads that are under the specified policy. The binding thread set 
 of the function is the team threads when being called inside a {\sf parallel} region, and all the threads in the current 
