@@ -36,12 +36,14 @@ motifs where two threading models must interoperate.
 %\subsubsection{Interacting with Other OpenMP Programs}
 %\input{ompomp}
 
-\subsubsection{Interacting with Parallel Libraries and Language Concurrency Features}
-\input{otherruntime}
-
 
 \subsubsection{Interoperability with Inter-node Model, e.g. MPI}
 \input{internode}
+
+%match the order of Fig. 1, and also the first paragraph of 2.1
+\subsubsection{Interacting with Parallel Libraries and Language Concurrency Features}
+\input{otherruntime}
+
 
 %In this
 %aspect, we still hope this paper could provide userful information and practices 
@@ -74,7 +76,7 @@ in the decision making for runtime scheduling and resource management.
 \subsection{Limitation of Interoperability Support in the Standard}
 The current OpenMP standard (4.5) provides limited support for users to influence the runtime for 
 better managing hardware resources and OpenMP threads to minimize the performance impact of oversubscription.
-First, the {\sf OMP\_DYNAMIC} variable, % as well as the {\sf dyn-var} ICV, 
+First, the {\sf OMP\_DYNAMIC} environment variable, % as well as the {\sf dyn-var} ICV, 
 and the {\sf omp\_set\_dynamic} %and {\sf omp\_get\_dynamic}
  routine, indicate the OpenMP runtime to adjust the number of threads to use for executing parallel
 regions in order to optimize the use of system resources. 
@@ -92,7 +94,7 @@ preventing the dynamic adjustment of thread waiting behavior during the executio
 Thirdly, the {\sf OMP\_THREAD\_LIMIT} environment %, {\sf thread-limit-var} ICV and the {\sf omp\_get\_thread\_limit} getter 
 give users an option to  
  set the maximum number of OpenMP threads when the program starts, addressing oversubscription issues in certain
- degree. It however does not provide setter to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
+ degree. It however does not provide an interface to adjust the upper bound of the threads for an OpenMP program during program execution, limiting
  its actually usage in real applications. 
 % by setting the threadlimitvar ICV.
 %The behavior of the program is implementation defined if the requested value of OMP\_THREAD\_LIMIT is greater than the number of threads an implementation can support
